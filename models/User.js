@@ -10,35 +10,18 @@ const UserSchema = new schema({
         type:String,
         required:true
     },
+    wallet_balance:{
+      type:String,
+      required:true
+  },
     password:{
         type: String,
         required:true,
     },
-    order:[
-        {
-            type:mongoose.Schema.ObjectId,
-            ref:"Order",
-        },
-    ],
-    wishLists:[
-        {
-            type:mongoose.Schema.ObjectId,
-            ref:"WishList",
-        },
-    
-],
 isAdmin:{
     type:Boolean,
     default:false,
 },
-hasShippingAddress:{
-type:Boolean,
-default: false,
-},
-shippingAddress:{
- firstName:{
-    type:String
- },
  address:{
     type:String
  },
@@ -58,9 +41,17 @@ shippingAddress:{
     type:String,
  },
 
+ wallent_address:{
+    type:String,
+ },
+
+  pin:{
+    type:String,
+ },
+
+
 },
   
-},
 {
     timestamps:true
 }  
