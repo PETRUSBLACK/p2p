@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 
-const isAmin = async (req, res, next) => {
+const isAdmin = async (req, res, next) => {
   const user = await User.findById(req.userAuth);
   //   console.log(user);
   if (user.isAdmin) {
@@ -10,4 +10,4 @@ const isAmin = async (req, res, next) => {
   }
 };
 
-export default isAmin;
+export default isAdmin;
