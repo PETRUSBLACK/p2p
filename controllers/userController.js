@@ -97,17 +97,14 @@ export const registerUserLevel3 = asyncHandler(async (req, res) => {
 })
 
 export const loginUserContrl = asyncHandler(async (req, res) => {
-  const { identifier, password } = req.body;
+  const { email, username, phone, password } = req.body;
 
-  const userFound = await User.findOne({
-    $or: [
-      { email: identifier },
-      { username: identifier },
-      { phoneNumber: identifier }
-    ]
-  });
+  const userFound = await User.findOne({ $or: [{ email }, { username }, { phone }] });
 
-  if (userFound && (await bcrypt.compare(password, userFound.password))) {
+  console.log(typeof password)
+  console.log(typeof userFound.password)
+
+  if (userFound && bcrypt.compare(password, userFound.password)) {
     res.json({
       status: "success",
       message: "User logged in successfully",
@@ -115,7 +112,7 @@ export const loginUserContrl = asyncHandler(async (req, res) => {
       token: generateToken(userFound._id),
     });
   } else {
-    throw new Error("Invalid email or password");
+    throw new Error(`Invalid email or password`);
   }
 
 });
