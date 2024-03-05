@@ -1,15 +1,14 @@
 import express from "express";
-import {
-  loginUserContrl,
-  registerUserContrl,
-  userProfile,
-} from "../controllers/userController.js";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
-import isAmin from "../middleware/isAdmin.js";
+import isAdmin from "../middleware/isAdmin.js";
+import { otpVerification, registerUserLevel1, registerUserLevel3, loginUserContrl, userProfile } from "../controllers/userController.js"
+
 
 const userRoutes = express.Router();
 
-userRoutes.post("/register", registerUserContrl);
+userRoutes.post("/register/l1", registerUserLevel1);
+userRoutes.post("/register/l2", otpVerification);
+userRoutes.post("/register/l3", registerUserLevel3);
 userRoutes.post("/login", loginUserContrl);
 userRoutes.get("/profile", isLoggedIn, userProfile);
 
