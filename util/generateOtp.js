@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 import OTP from "../models/OTP.js";
-import twilio from 'twilio'
+import { Vonage } from '@vonage/server-sdk';
 const generatedOTP = Math.floor(100000 + Math.random() * 900000);
 
 export const generateEmailOTP = async (email) => {
@@ -20,42 +20,22 @@ export const generateEmailOTP = async (email) => {
         text: `Your OTP for login is: ${generatedOTP}`,
     });
 
-
+    return generatedOTP.toString()
 };
 
 export const generateSmsOTP = async (phone) => {
-    const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-    const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+    const vonage = new Vonage({
+        apiKey: process.env.VONAGE_API_KEY,
+        apiSecret: process.env.VONAGE_API_SECRET
+    })
 
-    await twilioClient.messages.create({
-        body: `Your OTP for login is: ${generatedOTP}`,
-        to: phone,
-        from: twilioPhoneNumber,
-    });
+    const from = "P2P System"
+    const to = phone
+    const text = `Your OTP for login is: ${generatedOTP}`
+
+    await vonage.sms.send({ to, from, text })
+        .then(resp => { console.log('Message sent successfully'); console.log(resp); })
+        .catch(err => { console.log('There was an error sending the messages.'); console.error(err); });
+
+    return generatedOTP.toString()
 }
-
-
-
-// const accountSid = "ACb86ccc631cb4500d0b20f96e6e7bb9bc";
-// const authToken = process.env.TWILIO_AUTH_TOKEN;
-// const verifySid = "VAbb9c84ca56d8e0cda23330772a91c184";
-// const client = require("twilio")(accountSid, authToken)
-
-
-// client.verify.v2
-//   .services(verifySid)
-//   .verifications.create({ to: "+23409046807203", channel: "sms" })
-//   .then((verification) => console.log(verification.status))
-//   .then(() => {
-//     const readline = require("readline").createInterface({
-//       input: process.stdin,
-//       output: process.stdout,
-//     });
-//     readline.question("Please enter the OTP:", (otpCode) => {
-//       client.verify.v2
-//         .services(verifySid)
-//         .verificationChecks.create({ to: "+23409046807203", code: otpCode })
-//         .then((verification_check) => console.log(verification_check.status))
-//         .then(() => readline.close());
-//     });
-//   });

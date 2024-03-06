@@ -21,14 +21,17 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Email already in use" });
   }
 
-  const otpEmail = await generateEmailOTP(email)
-  const otpSms = await generateSmsOTP(phone)
+  const emailOTP = await generateEmailOTP(email)
+  const smsOTP = await generateSmsOTP(phone)
 
-  // const otp = await OTP.create({
-  //   email,
-  //   phone,
-  //   otp: generatedOTP.toString()
-  // });
+  const otp = await OTP.create({
+    email,
+    phone,
+    otp: {
+      emailOTP: emailOTP,
+      smsOTP: smsOTP
+    }
+  });
 
   const user = await User.create({
     fullname,
@@ -39,17 +42,17 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
   res.status(201).json({
     status: "success",
     message: "Move to the next registeration process",
-    data: { user, token: generateToken(user._id), otpEmail , otpSms},
+    data: { user, token: generateToken(user._id), otp },
   });
 });
 
 export const otpVerification = asyncHandler(async (req, res) => {
-  const { otp } = req.body;
+  const { emailOTP, smsOTP } = req.body;
 
-  const otpData = await OTP.findOne({ otp }).exec();
+  const otpData = await OTP.findOne({ 'otp.emailOTP': emailOTP,  'otp.smsOTP': smsOTP}).exec();
 
   if (otpData) {
-    await OTP.deleteOne({ otp });
+    await OTP.deleteOne(otpData);
 
     res.status(200).send('OTP verified successfully');
   } else {
