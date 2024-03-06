@@ -1,4 +1,3 @@
-// name
 import mongoose from 'mongoose';
 const schema = mongoose.Schema;
 
@@ -14,5 +13,5 @@ const coinSchema = new schema({
     }
 });
 
-const coin = mongoose.model("coin", coinSchema);
-export default coin;
+const Coin = mongoose.model("Coin", coinSchema);
+export default Coin;
