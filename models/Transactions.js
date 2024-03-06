@@ -19,7 +19,7 @@ const transactionSchema = new schema({
     },
     coin: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'coin',
+        ref: 'Coin',
         required: true
     },
     quantity: {
