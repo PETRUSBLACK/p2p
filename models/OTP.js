@@ -6,6 +6,10 @@ const OTPSchema = new schema({
 		type: String,
 		required: true,
 	},
+	phone:{
+		type: String,
+		required: true,
+	},
 	otp: {
 		type: String,
 		required: true,

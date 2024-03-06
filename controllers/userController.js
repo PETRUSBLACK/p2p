@@ -3,8 +3,8 @@ import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
 import generateToken from "../util/generateToken.js";
 import verifyToken from "../util/verifyToken.js";
-import nodemailer from 'nodemailer'
 import OTP from "../models/OTP.js";
+import { generateEmailOTP, generateSmsOTP } from "../util/generateOtp.js";
 
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -21,39 +21,25 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Email already in use" });
   }
 
+  const otpEmail = await generateEmailOTP(email)
+  const otpSms = await generateSmsOTP(phone)
+
+  // const otp = await OTP.create({
+  //   email,
+  //   phone,
+  //   otp: generatedOTP.toString()
+  // });
+
   const user = await User.create({
     fullname,
     email,
     phone,
   });
 
-  const token = generateToken(user._id)
-  const generatedOTP = Math.floor(100000 + Math.random() * 900000);
-
-  const otp = await OTP.create({
-    email,
-    otp: generatedOTP.toString()
-  });
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'OTP for Login',
-    text: `Your OTP for login is: ${generatedOTP}`,
-  });
-
   res.status(201).json({
     status: "success",
     message: "Move to the next registeration process",
-    data: { user, token, otp },
+    data: { user, token: generateToken(user._id), otpEmail , otpSms},
   });
 });
 
@@ -100,9 +86,6 @@ export const loginUserContrl = asyncHandler(async (req, res) => {
   const { email, username, phone, password } = req.body;
 
   const userFound = await User.findOne({ $or: [{ email }, { username }, { phone }] });
-
-  console.log(typeof password)
-  console.log(typeof userFound.password)
 
   if (userFound && bcrypt.compare(password, userFound.password)) {
     res.json({
