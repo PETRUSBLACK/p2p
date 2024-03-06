@@ -1,6 +1,6 @@
+import mongoose from 'mongoose';
 const schema = mongoose.Schema;
-
-const sellerSchema = new schema({
+const SellerSchema = new schema({
 
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -47,5 +47,5 @@ const sellerSchema = new schema({
 }
 )
 
-const Order = mongoose.model("Order",OrderSchema);
-export default Order;
+const Seller = mongoose.model("Seller",SellerSchema);
+export default Seller;

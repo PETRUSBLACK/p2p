@@ -1,6 +1,6 @@
+import mongoose from 'mongoose';
 const schema = mongoose.Schema;
-
-const orderSchema = new schema({
+const OrderSchema = new schema({
 
     seller:   {
         type: mongoose.Schema.Types.ObjectId,
