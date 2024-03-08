@@ -21,8 +21,12 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Email already in use" });
   }
 
-  const emailOTP = await generateEmailOTP(email)
-  const smsOTP = await generateSmsOTP(phone)
+  const generatedOTP = Math.floor(100000 + Math.random() * 900000);
+
+  // const emailOTP = await generateEmailOTP(email)
+  const emailOTP = generatedOTP
+  // const smsOTP = await generateSmsOTP(phone)
+  const smsOTP = generatedOTP
 
   const otp = await OTP.create({
     email,
@@ -49,7 +53,7 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
 export const otpVerification = asyncHandler(async (req, res) => {
   const { emailOTP, smsOTP } = req.body;
 
-  const otpData = await OTP.findOne({ 'otp.emailOTP': emailOTP,  'otp.smsOTP': smsOTP}).exec();
+  const otpData = await OTP.findOne({ 'otp.emailOTP': emailOTP, 'otp.smsOTP': smsOTP }).exec();
 
   if (otpData) {
     await OTP.deleteOne(otpData);
@@ -77,7 +81,9 @@ export const registerUserLevel3 = asyncHandler(async (req, res) => {
 
   const decoded = verifyToken(token)
 
-  const user = await User.findByIdAndUpdate(decoded.id, { username, password }, { new: true })
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const user = await User.findByIdAndUpdate(decoded.id, { username, password: hashedPassword }, { new: true })
 
   if (!user) {
     return res.status(404).json({ message: 'User not found' });
@@ -89,6 +95,11 @@ export const loginUserContrl = asyncHandler(async (req, res) => {
   const { email, username, phone, password } = req.body;
 
   const userFound = await User.findOne({ $or: [{ email }, { username }, { phone }] });
+  console.log(userFound)
+
+  if(!userFound.password){
+    throw new Error("Complete your registration process, your account has no password")
+  }
 
   if (userFound && bcrypt.compare(password, userFound.password)) {
     res.json({

@@ -1,11 +1,11 @@
 import asyncHandler from "express-async-handler";
-import Coin from "../models/Coin";
-const cloudinary = require('cloudinary').v2;
+import Coin from "../models/coin.js";
+import { v2 as cloudinary } from "cloudinary";
 
 export const createCoin = asyncHandler(async (req, res) => {
     const { name } = req.body;
-
-    const coinImage = req.coin.path
+    const coinImage = req?.file.path
+    const publicID = req?.file.filename
 
     const coinExits = await Coin.findOne({ name });
     if (coinExits) {
@@ -14,7 +14,10 @@ export const createCoin = asyncHandler(async (req, res) => {
 
     const createCoin = await Coin.create({
         name,
-        symbol: coinImage
+        symbol: {
+            symbol_public_id: publicID,
+            symbol_url: coinImage
+        }
     });
 
     res.status(201).json({
@@ -54,25 +57,29 @@ export const getAllCoin = asyncHandler(async (req, res) => {
 
 export const editCoin = asyncHandler(async (req, res) => {
     const { name } = req.body;
+    console.log(req)
+    const coinImage = req?.file.path
+    const publicID = req?.file.filename
 
-    const coinImage = req.coin.path
-
-    let coinToEdit = await Coin.findById(id);
+    let coinToEdit = await Coin.findById(req.params.id);
     if (!coinToEdit) {
         throw new Error("Coin does not exist");
     }
 
-    const result = await cloudinary.uploader.destroy(coinToEdit.symbol);
+    const result = await cloudinary.uploader.destroy(coinToEdit.symbol.symbol_public_id);
 
-    if(!result){
-        throw new Error("Problem updating coin");
+    if(!result.result == 'ok'){
+        throw new Error("Error updating coin");
     }
 
     const updatedCoin = await Coin.findByIdAndUpdate(
         req.params.id,
         {
             name,
-            symbol: coinImage
+            symbol: {
+                symbol_public_id: publicID,
+                symbol_url: coinImage
+            }
         },
         {
             new: true,
@@ -90,13 +97,9 @@ export const deleteCoin = asyncHandler(async (req, res) => {
     let coin;
     coin = await Coin.findById(req.params.id);
 
-    if (!Coin) {
-        throw new Error("Couldn't find coin");
-    }
+    const result = await cloudinary.uploader.destroy(coin.symbol.symbol_public_id);
 
-    const result = await cloudinary.uploader.destroy(deleteCoin.symbol);
-
-    if(result){
+    if(result.result == 'ok'){
         coin = await Coin.findByIdAndDelete(req.params.id);
     } else {
         throw new Error("Error deleting coin");
@@ -106,4 +109,4 @@ export const deleteCoin = asyncHandler(async (req, res) => {
         status: "success",
         message: "Coin deleted successfully",
     });
-})
+});
