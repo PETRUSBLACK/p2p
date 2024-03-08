@@ -8,8 +8,14 @@ const coinSchema = new schema({
         enum: ['Bitcoin', 'Ethereum', 'Dogecoin', 'Litecoin', 'Ripple', 'Bitcoin Cash', 'Solana']
     },
     symbol: {
-        type: String,
-        required: true
+        symbol_public_id: {
+            type: String,
+            required: true
+        },
+        symbol_url: {
+            type: String,
+            required: true
+        }
     }
 });
 

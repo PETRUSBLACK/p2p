@@ -58,7 +58,7 @@ const UserSchema = new schema({
     wallet_address: {
         type: String,
     },
-
+    
     pin: {
         type: String,
     },
