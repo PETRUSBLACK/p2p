@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const schema = mongoose.Schema;
 
-const coinSchema = new schema({
+const CoinSchema = new schema({
     name: {
         type: String,
         required: true,
@@ -19,5 +19,5 @@ const coinSchema = new schema({
     }
 });
 
-const Coin = mongoose.model("Coin", coinSchema);
+const Coin = mongoose.model("Coin", CoinSchema);
 export default Coin;

@@ -1,4 +1,3 @@
-// name
 import mongoose from 'mongoose';
 const schema = mongoose.Schema;
 
@@ -8,8 +7,14 @@ const CurrencySchema = new schema({
         required: true,
     },
     symbol: {
-        type: String,
-        required: true,
+        symbol_public_id: {
+            type: String,
+            required: true
+        },
+        symbol_url: {
+            type: String,
+            required: true
+        }
     }
 
 });

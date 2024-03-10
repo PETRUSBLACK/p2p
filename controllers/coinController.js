@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import Coin from "../models/coin.js";
+import Coin from "../models/Coin.js";
 import { v2 as cloudinary } from "cloudinary";
 
 export const createCoin = asyncHandler(async (req, res) => {

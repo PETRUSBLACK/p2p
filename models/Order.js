@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const schema = mongoose.Schema;
-const OrderSchema = new schema({
 
+const OrderSchema = new schema({
     seller:   {
         type: mongoose.Schema.Types.ObjectId,
         required:true,
@@ -17,6 +17,7 @@ const OrderSchema = new schema({
         type:String,
         required:true
     }, 
+
     price: {
         type:String,
         required:true
@@ -27,6 +28,7 @@ const OrderSchema = new schema({
         enum: ["Pending","cancelled","Successful"],
         required:true
     },
+    
     buyer: {
         type: mongoose.Schema.Types.ObjectId,
         required:true,
