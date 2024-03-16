@@ -79,7 +79,7 @@ export const registerUserLevel3 = asyncHandler(async (req, res) => {
   }
 
   if (password !== confirmPassword) {
-    return res.status(400).json({ message: 'Passwords do not match' });
+    return res.status(400).json({ message: 'Passwords do not match' }); 
   }
 
   if (!token) {
