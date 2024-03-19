@@ -17,7 +17,10 @@ const UserSchema = new schema({
         lowercase: true,
         unique: true
     },
-    password: String,
+    password: {
+        type: String,
+        select: false
+    },
     phone: {
         type: String,
         required: true
@@ -31,7 +34,7 @@ const UserSchema = new schema({
         type: String,
         default: () => {
             return `https://api.dicebear.com/6.x/${profile_imgs_collections_list[Math.floor(Math.random() * profile_imgs_collections_list.length)]}/svg?seed=${profile_imgs_name_list[Math.floor(Math.random() * profile_imgs_name_list.length)]}`
-        } 
+        }
     },
     personal_info: {
         address: {
@@ -50,24 +53,46 @@ const UserSchema = new schema({
             type: String,
         },
     },
-    
-    wallet_balance: {
-        type: String,
+
+    wallet_info: {
+        wallet_balance: {
+            type: String,
+        },
+
+        wallet_address: {
+            type: String,
+        },
+
+        pin: {
+            type: String,
+        },
     },
 
-    wallet_address: {
-        type: String,
+    seller_info: {
+        no_of_trades: {
+            type: Number,
+        },
+        no_of_completed_trades: {
+            type: Number,
+        },
+        percentage_of_completed_trades: {
+            type: Number,
+        },
+        likes: {
+            type: Number
+        },
+        reviews: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Review",
+            },
+        ],
     },
-    
-    pin: {
-        type: String,
-    },
+
     isAdmin: {
         type: Boolean,
         default: false,
     },
-
-
 },
 
     {

@@ -23,10 +23,8 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
 
   const generatedOTP = Math.floor(100000 + Math.random() * 900000);
 
-  // const emailOTP = await generateEmailOTP(email)
-  const emailOTP = generatedOTP
-  // const smsOTP = await generateSmsOTP(phone)
-  const smsOTP = generatedOTP
+  const emailOTP = await generateEmailOTP(email)
+  const smsOTP = await generateSmsOTP(phone)
 
   const otp = await OTP.create({
     email,
