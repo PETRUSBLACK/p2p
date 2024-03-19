@@ -26,6 +26,10 @@ const SellerSchema = new schema({
     type: Number,
     required: true,
   },
+  percentage_Completed: {
+    type: Number,
+    required: true,
+  },
   reviews: [
     {
       type: mongoose.Schema.Types.ObjectId,
