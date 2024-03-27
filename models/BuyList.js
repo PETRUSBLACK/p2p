@@ -5,8 +5,9 @@ const BuySchema = new schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        required: true
     },
-    crypto: {
+    cryptoCurrency: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Coin",
         required: true
@@ -16,7 +17,7 @@ const BuySchema = new schema({
         ref: "Currency",
         required: true
     },
-    price: {
+    pricePerCoin: {
         type: Number,
         required: true
     },
@@ -36,22 +37,22 @@ const BuySchema = new schema({
     },
     paymentTimeLimit: {
         type: Number,
-        default: 600 // 10 minutes in seconds
+        required: true
     },
     fee: {
-        type: Number
+        type: Number,
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Bought'],
+        default: 'Pending'
     }
 },
     {
         timestamps: true
     }
 )
-
-BuySchema.virtual('paymentTimeLimitRealTime').get(function() {
-    const minutes = Math.floor(this.paymentTimeLimit / 60);
-    const seconds = this.paymentTimeLimit % 60;
-    return `${minutes} minutes ${seconds} seconds`;
-});
 
 const BuyList = mongoose.model("BuyList", BuySchema);
 export default BuyList;

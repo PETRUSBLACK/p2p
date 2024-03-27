@@ -19,7 +19,6 @@ const UserSchema = new schema({
     },
     password: {
         type: String,
-        select: false
     },
     phone: {
         type: String,
@@ -28,7 +27,6 @@ const UserSchema = new schema({
     username: {
         type: String,
         minlength: [3, 'Username must be 3 letters long'],
-        unique: true,
     },
     profile_img: {
         type: String,

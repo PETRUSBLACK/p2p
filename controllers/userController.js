@@ -9,7 +9,7 @@ import { generateEmailOTP, generateSmsOTP } from "../util/generateOtp.js";
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-export const registerUserLevel1 = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, phone } = req.body;
 
   if (!emailRegex.test(email)) {
@@ -21,17 +21,15 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Email already in use" });
   }
 
-  const generatedOTP = Math.floor(100000 + Math.random() * 900000);
-
   const emailOTP = await generateEmailOTP(email)
-  const smsOTP = await generateSmsOTP(phone)
+  // const smsOTP = await generateSmsOTP(phone)
 
   const otp = await OTP.create({
     email,
     phone,
     otp: {
       emailOTP: emailOTP,
-      smsOTP: smsOTP
+      smsOTP: emailOTP
     }
   });
 
@@ -41,6 +39,7 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
     phone,
   });
 
+  console.log("User created")
   res.status(201).json({
     status: "success",
     message: "Move to the next registeration process",
@@ -62,7 +61,7 @@ export const otpVerification = asyncHandler(async (req, res) => {
   }
 })
 
-export const registerUserLevel3 = asyncHandler(async (req, res) => {
+export const updateUserInformation = asyncHandler(async (req, res) => {
   const { token, username, password, confirmPassword } = req.body;
 
   if (!passwordRegex.test(password)) {

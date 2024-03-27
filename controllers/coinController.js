@@ -7,10 +7,10 @@ export const createCoin = asyncHandler(async (req, res) => {
     const coinImage = req?.file.path
     const publicID = req?.file.filename
 
-    const coinExits = await Coin.findOne({ name });
-    if (coinExits) {
-        throw new Error(`Coin with ${name} already exists`);
-    }
+        const coinExits = await Coin.findOne({ name });
+        if (coinExits) {
+            throw new Error(`Coin with ${name} already exists`);
+        }
 
     const createCoin = await Coin.create({
         name,
@@ -56,8 +56,7 @@ export const getAllCoin = asyncHandler(async (req, res) => {
 });
 
 export const editCoin = asyncHandler(async (req, res) => {
-    const { name } = req.body;
-    console.log(req)
+    const { name } = req.body;  
     const coinImage = req?.file.path
     const publicID = req?.file.filename
 
