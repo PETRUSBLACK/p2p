@@ -7,34 +7,51 @@ const OrderSchema = new schema({
         required:true,
         ref: "User",
     }, 
-    coin:   {
-        type: mongoose.Schema.Types.ObjectId,
-        required:true,
-        ref: "coin",
-    }, 
-     
-    amount:   {
-        type:String,
-        required:true
-    }, 
-
-    price: {
-        type:String,
-        required:true
-    },
-    
-    status:{
-        type:String,
-        enum: ["Pending","cancelled","Successful"],
-        required:true
-    },
-    
     buyer: {
         type: mongoose.Schema.Types.ObjectId,
         required:true,
         ref: "User",
     },
- 
+    cryptoCurrency:   {
+        type: mongoose.Schema.Types.ObjectId,
+        required:true,
+        ref: "Coin",
+    }, 
+    totalQuantityOfCryptoBought: {
+        type: Number
+    },
+    totalFiatAmountToPay: {
+        type: Number,
+        required: true
+    }, 
+    pricePerCoin: {
+        type: String,
+        required: true
+    },
+    tradeType:{
+        type:String,
+        required:true
+    },
+    orderNumber: {
+        type: Number
+    },
+    paymentTimeLimit: {
+        type: Number,
+        required: true
+    },
+    details: {
+        type: String,
+        required: true
+    },
+    status:{
+        type:String,
+        enum: ["Pending","cancelled","Successful"],
+        required:true
+    },
+    reserve: {
+        type: Number,
+        required: true
+    }
 },
 
 {
