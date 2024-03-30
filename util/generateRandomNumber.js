@@ -15,3 +15,16 @@ export const generateSerialNumber = () => {
     }
     return serialNumber;
 }
+
+export const generateOrderNumber  = () => {
+    let orderNumber = '';
+    const characters = '0123456789';
+    const length = 18;
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        orderNumber += characters[randomIndex];
+    }
+
+    return orderNumber;
+}

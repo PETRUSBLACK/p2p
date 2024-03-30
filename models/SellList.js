@@ -13,8 +13,7 @@ const SellSchema = new schema({
         required: true
     },
     fiatCurrency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Currency",
+        type: String,
         required: true
     },
     pricePerCoin: {
@@ -40,7 +39,9 @@ const SellSchema = new schema({
         required: true
     },
     accountInfoForTransaction:{
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PaymentAccount",
+        required: true
     },
     details: {
         type: String,

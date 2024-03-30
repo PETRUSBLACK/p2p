@@ -3,10 +3,12 @@ import isAdmin from "../middleware/isAdmin.js";
 import { createCoin, deleteCoin, editCoin, getAllCoin, getCoin } from "../controllers/coinController.js";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import upload from '../config/fileUpload.js'
+import dotenv from "dotenv";
+dotenv.config();
 
 const coinRoutes = express.Router();
 
-coinRoutes.post("/create",isLoggedIn, isAdmin, upload.single('coin'), createCoin);
+coinRoutes.post("/",isLoggedIn, isAdmin, upload.single('coin'), createCoin);
 coinRoutes.put("/:id", isLoggedIn, isAdmin, upload.single('coin'), editCoin);
 coinRoutes.get("/:id", isLoggedIn, getCoin);
 coinRoutes.get("/", getAllCoin);

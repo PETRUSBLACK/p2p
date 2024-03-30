@@ -2,32 +2,38 @@ import mongoose from 'mongoose';
 const schema = mongoose.Schema;
 
 const transactionSchema = new schema({
-    buyer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    amount: {
+        type: Number,
+        required: true
     },
-    seller: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    currency: {
+        type: String,
+        required: true
     },
-    coin: {
+    cryptocurrency: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Coin',
         required: true
     },
-    quantity: {
-        type: Number,
+    cryptocurrencyName:{
+        type: String,
         required: true
     },
-    price: {
-        type: Number,
+    sender: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    receiver: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     status: {
         type: String,
-        enum: ['pending', 'completed', 'cancelled'],
-        default: 'pending'
-    }
+        enum: ['Pending', 'Completed', 'Failed'],
+        default: 'Pending'
+    },
 }, { timestamps: true });
 
 const Transactions = mongoose.model("Transactions", transactionSchema);
