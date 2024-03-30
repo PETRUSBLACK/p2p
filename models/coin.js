@@ -4,8 +4,7 @@ const schema = mongoose.Schema;
 const CoinSchema = new schema({
     name: {
         type: String,
-        required: true,
-        enum: ['Bitcoin', 'Ethereum', 'Dogecoin', 'Litecoin', 'Ripple', 'Bitcoin Cash', 'Solana']
+        required: true
     },
     symbol: {
         symbol_public_id: {
@@ -16,7 +15,8 @@ const CoinSchema = new schema({
             type: String,
             required: true
         }
-    }
+    }, 
+    limit: Number
 });
 
 const Coin = mongoose.model("Coin", CoinSchema);

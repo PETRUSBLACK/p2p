@@ -9,10 +9,10 @@ const ReviewSchema = new schema(
       ref: "User",
       required: [true, "Review must belong to a users"],
     },
-    seller: {
+    userReviewed: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Seller",
-      required: [true, "Review must belong to a seller"],
+      ref: "User",
+      required: [true, "Review must belong to a user"],
     },
     message: {
       type: String,

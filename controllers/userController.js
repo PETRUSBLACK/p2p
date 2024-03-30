@@ -22,7 +22,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 
   const emailOTP = await generateEmailOTP(email)
-  // const smsOTP = await generateSmsOTP(phone)
+  const smsOTP = await generateSmsOTP(phone)
 
   const otp = await OTP.create({
     email,
