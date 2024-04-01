@@ -4,10 +4,10 @@ import { createSellList, createSellListValidationRules, deleteSellList, getAllSe
 
 const sellListRoutes = express.Router();
 
-sellListRoutes.post("/",isLoggedIn, createSellList);
+sellListRoutes.post("/",isLoggedIn, createSellListValidationRules(), createSellList);
 sellListRoutes.put("/:id/update", isLoggedIn, updateSellListValidationRules(), updateSellList);
 sellListRoutes.delete("/:id/delete", isLoggedIn, deleteSellList);
 sellListRoutes.get("/", isLoggedIn, getAllSellListing);
-sellListRoutes.get("/", isLoggedIn, getUserSellListing);
+sellListRoutes.get("/user", isLoggedIn, getUserSellListing);
 
 export default sellListRoutes;

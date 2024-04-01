@@ -7,7 +7,7 @@ import PaymentAccount from "../models/paymentAccount.js";
 
 export const createSellListValidationRules = () => {
     return [
-        body("cryptoCurrency").exists().withMessage("Crypto Currency is required"),
+        body("cryptoCurrencyName").exists().withMessage("Crypto Currency is required"),
         body("fiatCurrency").exists().withMessage("Fiat currency is required"),
         body("pricePerCoin").isNumeric().withMessage("Invalid Price").exists().withMessage("Price is required"),
         body("totalAmountOfCrypto").isNumeric().withMessage("Invalid Amount").exists().withMessage("Amount is required"),
@@ -15,12 +15,14 @@ export const createSellListValidationRules = () => {
         body("rangeMax").isNumeric().withMessage("Invalid Max range").exists().withMessage("Max range is required"),
         body("paymentTimeLimit").isNumeric().withMessage("Invalid Payment time limit"),
         body("fee").optional().isNumeric().withMessage("Invalid Fee"),
+        body("details").exists().withMessage("Listing Details currency is required"),
+        body("accountNumber").exists().withMessage("Provide an account")
     ];
 };
 
 export const updateSellListValidationRules = () => {
     return [
-        body("cryptoCurrency").optional(),
+        body("cryptoCurrencyName").optional(),
         body("fiatCurrency").optional(),
         body("pricePerCoin").optional().isNumeric().withMessage("Invalid Price"),
         body("totalAmountOfCrypto").optional().isNumeric().withMessage("Invalid Amount"),
@@ -28,16 +30,18 @@ export const updateSellListValidationRules = () => {
         body("rangeMax").optional().isNumeric().withMessage("Invalid Max range"),
         body("paymentTimeLimit").optional().isNumeric().withMessage("Invalid Payment time limit"),
         body("fee").optional().isNumeric().withMessage("Invalid Fee"),
+        body("details").optional().exists().withMessage("Listing Details currency is required"),
+        body("accountNumber").optional().exists().withMessage("Provide an account")
     ];
 };
 
 export const createSellList = asyncHandler(async (req, res) => {
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({
-    //         message: errors.array()[0].msg
-    //     });
-    // }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array()[0].msg
+        });
+    }
 
     const { cryptoCurrencyName, fiatCurrency, pricePerCoin, totalAmountOfCrypto, rangeMin, rangeMax, paymentTimeLimit, fee, details, accountNumber } = req.body;
 
@@ -88,7 +92,9 @@ export const createSellList = asyncHandler(async (req, res) => {
 export const updateSellList = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+            message: errors.array()[0].msg
+        });
     }
 
     const { cryptoCurrencyName, fiatCurrency, pricePerCoin, totalAmountOfCrypto, rangeMin, rangeMax, paymentTimeLimit, fee, details, accountNumber } = req.body;
@@ -181,7 +187,7 @@ export const getAllSellListing = asyncHandler(async (req, res) => {
             status: "success",
             message: "Sell Listing retrieved successfully",
             data: sellLists
-        });
+        }); 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }

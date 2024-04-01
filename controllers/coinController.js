@@ -3,7 +3,6 @@ import Coin from "../models/coin.js";
 import cloudinary from "cloudinary";
 
 export const createCoin = asyncHandler(async (req, res) => {
-    console.log(req.body)
     const { name, limit, symbol } = req.body;
 
     const myCloud = await cloudinary.v2.uploader.upload(symbol, {
@@ -60,9 +59,11 @@ export const getAllCoin = asyncHandler(async (req, res) => {
 });
 
 export const editCoin = asyncHandler(async (req, res) => {
-    const { name, limit } = req.body;
-    const coinImage = req?.file.path
-    const publicID = req?.file.filename
+    const { name, limit, symbol } = req.body;
+
+    const myCloud = await cloudinary.v2.uploader.upload(symbol, {
+        folder: "p2p Coin"
+    })
 
     let coinToEdit = await Coin.findById(req.params.id);
     if (!coinToEdit) {
@@ -80,8 +81,8 @@ export const editCoin = asyncHandler(async (req, res) => {
         {
             name,
             symbol: {
-                symbol_public_id: publicID,
-                symbol_url: coinImage
+                symbol_public_id: myCloud.public_id,
+                symbol_url: myCloud.secure_url
             },
             limit
         },

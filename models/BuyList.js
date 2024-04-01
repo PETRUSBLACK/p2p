@@ -39,6 +39,10 @@ const BuySchema = new schema({
         type: Number,
         required: true
     },
+    details: {
+        type: String,
+        required: true
+    },
     fee: {
         type: Number,
         required: true
