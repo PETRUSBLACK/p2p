@@ -4,6 +4,7 @@ import SellList from "../models/SellList.js";
 import Coin from "../models/coin.js";
 import Transactions from "../models/Transactions.js";
 import PaymentAccount from "../models/paymentAccount.js";
+import Notification from "../models/Notification.js";
 
 export const createOrder = asyncHandler(async (req, res) => {
     const { totalFiatAmountToPay, totalQuantityOfCryptoBought } = req.body;
