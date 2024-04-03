@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Coin from "../models/coin.js";
 import cloudinary from "cloudinary";
+import Wallet from "../models/Wallet.js";
 
 export const createCoin = asyncHandler(async (req, res) => {
     const { name, limit, symbol } = req.body;
@@ -23,11 +24,31 @@ export const createCoin = asyncHandler(async (req, res) => {
         limit
     });
 
-    res.status(201).json({
-        status: "success",
-        message: "Coin created successfully",
-        createCoin,
-    });
+    const wallet = await Wallet.find()
+
+    if(wallet.length === 0){
+        res.status(201).json({
+            status: "success",
+            message: "Coin created successfully",
+            createCoin
+        });
+    }else{
+        const updatedWallets = await wallet.updateMany({}, {
+            $push: {
+                coins: {
+                    coin: createCoin._id,
+                    quantity: 0,
+                    totalCoinValue: 0
+                }
+            }
+        });
+
+        res.status(201).json({
+            status: "success",
+            message: "Coin created successfully and all wallets have been updated",
+            createCoin
+        });
+    }
 })
 
 export const getCoin = asyncHandler(async (req, res) => {
