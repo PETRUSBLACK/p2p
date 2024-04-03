@@ -8,7 +8,7 @@ const userRoutes = express.Router();
 
 userRoutes.post("/register", registerUser);
 userRoutes.post("/verifyotp", otpVerification);
-userRoutes.put('/resendOtp', resendOTP)
+userRoutes.get('/resendOtp', resendOTP)
 userRoutes.put("/update-password", isLoggedIn, updatePassword);
 userRoutes.post("/login", loginUserContrl);
 userRoutes.get("/profile", isLoggedIn, userProfile);
