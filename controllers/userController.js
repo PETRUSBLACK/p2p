@@ -7,7 +7,6 @@ import asyncHandler from "express-async-handler";
 import { generateEmailOTP, generateSmsOTP } from "../util/generateOtp.js";
 import { generateToken, verifyToken } from "../util/jwtUtils.js";
 
-
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -85,44 +84,30 @@ export const otpVerification = asyncHandler(async (req, res) => {
 })
 
 export const resendOTP = asyncHandler(async (req, res) => {
-  const { otpId, resendEmailOTP, resendSmsOTP } = req.body;
+  const { oldOtp, resendEmailOTP, resendSmsOTP } = req.body
+  
+  const otp = await OTP.findById(oldOtp)
 
-  let otp = await OTP.findById(otpId);
-
-  if (!otp) {
-    return res.status(400).json({
-      success: false,
-      message: "Couldn't find OTP data for the provided email and phone"
-    });
+  if(!otp){
+    res.status(400).json({ message: "Otp not found"})
   }
 
-  try {
-    if (resendEmailOTP) {
-      const emailOTP = await generateEmailOTP(otp.user.email);
-      otp.emailOTP = emailOTP;
-    }
+  const emailOtp = await generateEmailOTP(otp.user.email);
 
-    if (resendSmsOTP) {
-      // const smsOTP = await generateSmsOTP(otp.user.phone)
-      const smsOTP = await generateEmailOTP(otp.user.email);
-      otp.smsOTP = smsOTP;
-    }
-
-    await otp.save();
-
-    res.status(201).json({
-      status: "success",
-      message: "OTP(s) resent successfully",
-      otpIdForResendingOtp: otp._id
-    });
-
-  } catch (error) {
-    console.error("Error while updating OTP:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error"
-    });
+  if(resendEmailOTP){
+    otp.otp.emailOTP = emailOtp
   }
+
+  if(resendSmsOTP){
+    otp.otp.smsOTP = emailOtp
+  }
+
+  await otp.save();
+
+  res.status(200).json({
+    status: true,
+    message: resendEmailOTP ? `${otp.user.fullname} please check your email for your new otp` : `${otp.user.fullname} please check your sms for your new otp`
+  })
 });
 
 export const updatePassword = asyncHandler(async (req, res) => {

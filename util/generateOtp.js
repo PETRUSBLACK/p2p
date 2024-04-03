@@ -1,10 +1,10 @@
 import nodemailer from 'nodemailer'
 import OTP from "../models/OTP.js";
 import { Vonage } from '@vonage/server-sdk';
-const generatedOTP = Math.floor(100000 + Math.random() * 900000);
+// const generatedOTP = Math.floor(100000 + Math.random() * 900000);
 
 export const generateEmailOTP = async (email) => {
-    // const generatedOTP = Math.floor(100000 + Math.random() * 900000);
+    const generatedOTP = Math.floor(100000 + Math.random() * 900000);
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -21,6 +21,7 @@ export const generateEmailOTP = async (email) => {
         text: `Your OTP for login is: ${generatedOTP}`,
     });
 
+    console.log(generatedOTP)
     return generatedOTP.toString()
 };
 
