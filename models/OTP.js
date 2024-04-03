@@ -2,14 +2,7 @@ import mongoose from 'mongoose'
 const schema = mongoose.Schema;
 
 const OTPSchema = new schema({
-	email: {
-		type: String,
-		required: true,
-	},
-	phone: {
-		type: String,
-		required: true,
-	},
+	user: Object,
 	otp: {
 		emailOTP: {
 			type: String,
