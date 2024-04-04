@@ -1,11 +1,14 @@
 import asyncHandler from "express-async-handler";
 import Coin from "../models/coin.js";
-import { v2 as cloudinary } from "cloudinary";
+import cloudinary from "cloudinary";
+import Wallet from "../models/Wallet.js";
 
 export const createCoin = asyncHandler(async (req, res) => {
-    const { name } = req.body;
-    const coinImage = req?.file.path
-    const publicID = req?.file.filename
+    const { name, limit, symbol } = req.body;
+
+    const myCloud = await cloudinary.v2.uploader.upload(symbol, {
+        folder: "p2p Coin"
+    })
 
     const coinExits = await Coin.findOne({ name });
     if (coinExits) {
@@ -15,16 +18,37 @@ export const createCoin = asyncHandler(async (req, res) => {
     const createCoin = await Coin.create({
         name,
         symbol: {
-            symbol_public_id: publicID,
-            symbol_url: coinImage
-        }
+            symbol_public_id: myCloud.public_id,
+            symbol_url: myCloud.secure_url
+        },
+        limit
     });
 
-    res.status(201).json({
-        status: "success",
-        message: "Coin created successfully",
-        createCoin,
-    });
+    const wallet = await Wallet.find()
+
+    if(wallet.length === 0){
+        res.status(201).json({
+            status: "success",
+            message: "Coin created successfully",
+            createCoin
+        });
+    }else{
+        const updatedWallets = await wallet.updateMany({}, {
+            $push: {
+                coins: {
+                    coin: createCoin._id,
+                    quantity: 0,
+                    totalCoinValue: 0
+                }
+            }
+        });
+
+        res.status(201).json({
+            status: "success",
+            message: "Coin created successfully and all wallets have been updated",
+            createCoin
+        });
+    }
 })
 
 export const getCoin = asyncHandler(async (req, res) => {
@@ -56,19 +80,20 @@ export const getAllCoin = asyncHandler(async (req, res) => {
 });
 
 export const editCoin = asyncHandler(async (req, res) => {
-    const { name } = req.body;
-    console.log(req)
-    const coinImage = req?.file.path
-    const publicID = req?.file.filename
+    const { name, limit, symbol } = req.body;
+
+    const myCloud = await cloudinary.v2.uploader.upload(symbol, {
+        folder: "p2p Coin"
+    })
 
     let coinToEdit = await Coin.findById(req.params.id);
     if (!coinToEdit) {
         throw new Error("Coin does not exist");
     }
 
-    const result = await cloudinary.uploader.destroy(coinToEdit.symbol.symbol_public_id);
+    const result = await cloudinary.v2.uploader.destroy(coinToEdit.symbol.symbol_public_id);
 
-    if(!result.result == 'ok'){
+    if (!result.result == 'ok') {
         throw new Error("Error updating coin");
     }
 
@@ -77,9 +102,10 @@ export const editCoin = asyncHandler(async (req, res) => {
         {
             name,
             symbol: {
-                symbol_public_id: publicID,
-                symbol_url: coinImage
-            }
+                symbol_public_id: myCloud.public_id,
+                symbol_url: myCloud.secure_url
+            },
+            limit
         },
         {
             new: true,
@@ -97,9 +123,9 @@ export const deleteCoin = asyncHandler(async (req, res) => {
     let coin;
     coin = await Coin.findById(req.params.id);
 
-    const result = await cloudinary.uploader.destroy(coin.symbol.symbol_public_id);
+    const result = await cloudinary.v2.uploader.destroy(coin.symbol.symbol_public_id);
 
-    if(result.result == 'ok'){
+    if (result.result == 'ok') {
         coin = await Coin.findByIdAndDelete(req.params.id);
     } else {
         throw new Error("Error deleting coin");

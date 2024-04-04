@@ -1,5 +1,5 @@
 import obtainTokenFromHeaders from "../util/obtainTokenFromHeader.js";
-import verifyToken from "../util/verifyToken.js";
+import { verifyToken } from "../util/jwtUtils.js";
 
 export const isLoggedIn = (req, res, next) => {
   //obtain token from header

@@ -5,18 +5,18 @@ const SellSchema = new schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        required: true
     },
-    crypto: {
+    cryptoCurrency: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Coin",
         required: true
     },
     fiatCurrency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Currency",
+        type: String,
         required: true
     },
-    price: {
+    pricePerCoin: {
         type: Number,
         required: true
     },
@@ -36,22 +36,31 @@ const SellSchema = new schema({
     },
     paymentTimeLimit: {
         type: Number,
-        default: 600 // 10 minutes in seconds
+        required: true
+    },
+    accountInfoForTransaction:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PaymentAccount",
+        required: true
+    },
+    details: {
+        type: String,
+        required: true
     },
     fee: {
-        type: Number
+        type: Number,
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Sold'],
+        default: 'Pending'
     }
 },
     {
         timestamps: true
     }
 )
-
-SellSchema.virtual('paymentTimeLimitRealTime').get(function() {
-    const minutes = Math.floor(this.paymentTimeLimit / 60);
-    const seconds = this.paymentTimeLimit % 60;
-    return `${minutes} minutes ${seconds} seconds`;
-});
 
 const SellList = mongoose.model("SellList", SellSchema);
 export default SellList;

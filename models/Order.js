@@ -1,46 +1,85 @@
 import mongoose from 'mongoose';
+import { generateOrderNumber } from '../util/generateRandomNumber.js';
 const schema = mongoose.Schema;
 
 const OrderSchema = new schema({
-    seller:   {
+    seller: {
         type: mongoose.Schema.Types.ObjectId,
-        required:true,
+        required: true,
         ref: "User",
-    }, 
-    coin:   {
-        type: mongoose.Schema.Types.ObjectId,
-        required:true,
-        ref: "coin",
-    }, 
-     
-    amount:   {
-        type:String,
-        required:true
-    }, 
-
-    price: {
-        type:String,
-        required:true
     },
-    
-    status:{
-        type:String,
-        enum: ["Pending","cancelled","Successful"],
-        required:true
-    },
-    
     buyer: {
         type: mongoose.Schema.Types.ObjectId,
-        required:true,
+        required: true,
         ref: "User",
     },
- 
+    cryptoCurrency: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "Coin",
+    },
+    totalQuantityOfCryptoBought: {
+        type: Number,
+        required: true
+    },
+    fiatCurrency: {
+        type: String,
+        required: true
+    },
+    totalFiatAmountToPay: {
+        type: Number,
+        required: true
+    },
+    pricePerCoin: {
+        type: String,
+        required: true
+    },
+    accountInfoForTransaction: {
+        type: Object,
+        required: true
+    },
+    tradeType: {
+        type: String,
+        required: true
+    },
+    orderNumber: {
+        type: Number,
+        default: generateOrderNumber()
+    },
+    paymentTimeLimit: {
+        type: Number,
+        required: true
+    },
+    details: {
+        type: String,
+        required: true
+    },
+    transactions: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Transactions",
+        }
+    ],
+    notifications: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Notification",
+        }
+    ],
+    status: {
+        type: String,
+        enum: ["Pending", "Cancelled", "Successful"],
+        default: "Pending"
+    },
+    reserve: {
+        type: Number
+    }
 },
 
-{
-    timestamps:true
-}
+    {
+        timestamps: true
+    }
 )
 
-const Order = mongoose.model("Order",OrderSchema);
+const Order = mongoose.model("Order", OrderSchema);
 export default Order;
