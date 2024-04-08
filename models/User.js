@@ -22,7 +22,7 @@ const UserSchema = new schema({
     },
     phone: {
         type: String,
-        required: true
+        // required: true
     },
     username: {
         type: String,
@@ -69,6 +69,9 @@ const UserSchema = new schema({
         type: Boolean,
         default: false,
     },
+    googleId: {
+        type: String
+    }
 },
 
     {
