@@ -16,12 +16,19 @@ passport.use(
       User.findOne({ googleId: profile.id })
         .then(async (user) => {
           if (!user) {
-            const newUser = new User({
+            // check if user already signed up with email and password
+            const userWithEmail = await User.findOne({ email: profile.email });
+            if (userWithEmail) {
+              throw new Error("User with email already exists");
+            }
+
+            const newUser = await User.create({
               googleId: profile.id,
               fullname: `${profile.name.givenName} ${profile.name.familyName}`,
               email: profile.email,
             });
-            return newUser.save();
+
+            return newUser;
           }
           return user;
         })
