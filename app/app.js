@@ -8,6 +8,7 @@ import coinRoutes from "../routes/coinRoute.js";
 import sellListRoutes from "../routes/sellListRoute.js";
 import paymentAccountRoutes from "../routes/paymentAccountRoute.js";
 import buyListRoutes from "../routes/buyListRoute.js";
+import oauthRoutes from "../routes/oauthRoutes.js";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import orderRoutes from "../routes/orderRoute.js";
 dbConnect();
@@ -23,6 +24,7 @@ cloudinary.config({
 const app = express();
 app.use(express.json());
 
+app.use("/api/v1/auth", oauthRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/coins",isLoggedIn, coinRoutes);
 app.use("/api/v1/sellList",isLoggedIn, sellListRoutes);
