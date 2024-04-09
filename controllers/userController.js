@@ -1,16 +1,17 @@
 import User from "../models/User.js";
+import Coin from "../models/coin.js";
+import Wallet from "../models/Wallet.js";
+import OTP from "../models/OTP.js";
 import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
-import generateToken from "../util/generateToken.js";
-import verifyToken from "../util/verifyToken.js";
-import nodemailer from 'nodemailer'
-import OTP from "../models/OTP.js";
+import { generateEmailOTP, generateSmsOTP } from "../util/generateOtp.js";
+import { generateToken, verifyToken } from "../util/jwtUtils.js";
 
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-export const registerUserLevel1 = asyncHandler(async (req, res) => {
-  const { fullname, email, phone } = req.body;
+export const registerUser = asyncHandler(async (req, res) => {
+  const { fullname, email, phone, password } = req.body;
 
   if (!emailRegex.test(email)) {
     return res.status(403).json({ "error": "Email is Invalid" })
@@ -21,79 +22,126 @@ export const registerUserLevel1 = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Email already in use" });
   }
 
-  const user = await User.create({
+  const emailOTP = await generateEmailOTP(email)
+  // const smsOTP = await generateSmsOTP(phone)
+
+  const user = {
     fullname,
     email,
     phone,
-  });
-
-  const token = generateToken(user._id)
-  const generatedOTP = Math.floor(100000 + Math.random() * 900000);
+    password
+  }
 
   const otp = await OTP.create({
-    email,
-    otp: generatedOTP.toString()
+    user,
+    otp: {
+      emailOTP: emailOTP,
+      smsOTP: emailOTP
+    }
   });
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'OTP for Login',
-    text: `Your OTP for login is: ${generatedOTP}`,
-  });
+  if (otp) {
+    console.log("Yes otp was created")
+  }
 
   res.status(201).json({
     status: "success",
-    message: "Move to the next registeration process",
-    data: { user, token, otp },
+    message: `Please check your email and sms ${user.fullname} for your otp's`,
+    otpIdForResendingOtp: otp._id
   });
 });
 
 export const otpVerification = asyncHandler(async (req, res) => {
-  const { otp } = req.body;
+  const { emailOTP, smsOTP } = req.body;
 
-  const otpData = await OTP.findOne({ otp }).exec();
+  const otpData = await OTP.findOne({ 'otp.emailOTP': emailOTP, 'otp.smsOTP': smsOTP }).exec();
 
   if (otpData) {
-    await OTP.deleteOne({ otp });
+    const userData = otpData.user
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-    res.status(200).send('OTP verified successfully');
+    const user = await User.create({
+      fullname: userData.fullname,
+      email: userData.email,
+      password: hashedPassword,
+      phone: userData.phone
+    })
+
+    initializeUserWallet(user._id)
+
+    res.status(200).json({
+      status: "success",
+      message: "Otp verified succesfully",
+      user,
+    })
   } else {
-    res.status(400).send('Invalid OTP');
+    res.status(400).json({
+      success: false,
+      message: "Invalid Otp"
+    });
   }
 })
 
-export const registerUserLevel3 = asyncHandler(async (req, res) => {
-  const { token, username, password, confirmPassword } = req.body;
+export const resendOTP = asyncHandler(async (req, res) => {
+  const { oldOtp, resendEmailOTP, resendSmsOTP } = req.body
+  
+  const otp = await OTP.findById(oldOtp)
 
-  if (!passwordRegex.test(password)) {
-    return res.status(403).json({ "error": "Password should be 6 to 20 characters long with a numeric, 1 lowercase and 1 uppercase letters" })
+  if(!otp){
+    res.status(400).json({ message: "Otp not found"})
   }
 
   if (password !== confirmPassword) {
     return res.status(400).json({ message: 'Passwords do not match' }); 
+  const emailOtp = await generateEmailOTP(otp.user.email);}
+
+  if(resendEmailOTP){
+    otp.otp.emailOTP = emailOtp
   }
 
-  if (!token) {
-    return res.status(400).json({ message: 'Token is required' });
+  if(resendSmsOTP){
+    otp.otp.smsOTP = emailOtp
   }
 
-  const decoded = verifyToken(token)
+  await otp.save();
 
-  const user = await User.findByIdAndUpdate(decoded.id, { username, password }, { new: true })
+  res.status(200).json({
+    status: true,
+    message: resendEmailOTP ? `${otp.user.fullname} please check your email for your new otp` : `${otp.user.fullname} please check your sms for your new otp`
+  })
+});
 
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+export const updatePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+  if (!passwordRegex.test(newPassword) || newPassword !== confirmNewPassword) {
+    return res.status(400).json({ message: "New password is invalid or does not match the confirmation" });
   }
-  res.json({ message: 'Step 2 completed successfully', user });
+
+  try {
+    const user = await User.findById(req.userAuth);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isPasswordValid = bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    const updatedUser = await user.save();
+
+    res.status(201).json({ message: "Password updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating Password:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 })
 
 export const loginUserContrl = asyncHandler(async (req, res) => {
@@ -101,8 +149,9 @@ export const loginUserContrl = asyncHandler(async (req, res) => {
 
   const userFound = await User.findOne({ $or: [{ email }, { username }, { phone }] });
 
-  console.log(typeof password)
-  console.log(typeof userFound.password)
+  if (!userFound.password) {
+    throw new Error("Complete your registration process, your account has no password")
+  }
 
   if (userFound && bcrypt.compare(password, userFound.password)) {
     res.json({
@@ -126,3 +175,28 @@ export const userProfile = asyncHandler(async (req, res) => {
     userFound
   });
 });
+
+
+async function initializeUserWallet(userId) {
+  try {
+    const allCoins = await Coin.find();
+
+    const walletCoins = allCoins.map(coin => ({
+      coin: coin._id,
+      quantity: 0,
+      totalCoinValue: 0
+    }));
+
+    const wallet = await Wallet.create({
+      userId: userId,
+      coins: walletCoins
+    })
+
+    if (!wallet) {
+      return res.status(500).json({ "error": "Failed to create user wallet" })
+    }
+  } catch (error) {
+    console.error('Error initializing user wallet:', error.message);
+    throw error;
+  }
+}

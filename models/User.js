@@ -17,7 +17,9 @@ const UserSchema = new schema({
         lowercase: true,
         unique: true
     },
-    password: String,
+    password: {
+        type: String,
+    },
     phone: {
         type: String,
         required: true
@@ -25,55 +27,76 @@ const UserSchema = new schema({
     username: {
         type: String,
         minlength: [3, 'Username must be 3 letters long'],
-        unique: true,
+        unique: true
     },
     profile_img: {
         type: String,
         default: () => {
             return `https://api.dicebear.com/6.x/${profile_imgs_collections_list[Math.floor(Math.random() * profile_imgs_collections_list.length)]}/svg?seed=${profile_imgs_name_list[Math.floor(Math.random() * profile_imgs_name_list.length)]}`
-        } 
+        }
     },
-    personal_info: {
-        address: {
-            type: String
-        },
-        city: {
-            type: String,
-        },
-        postalCode: {
-            type: String,
-        },
-        state: {
-            type: String,
-        },
-        country: {
-            type: String,
-        },
-    },
-    
-    wallet_balance: {
+    bio: {
         type: String,
     },
-
-    wallet_address: {
+    location: {
         type: String,
     },
-
-    pin: {
-        type: String,
+    seller_info: {
+        no_of_trades: {
+            type: Number,
+        },
+        no_of_completed_trades: {
+            type: Number,
+        },
+        percentage_of_completed_trades: {
+            type: Number,
+        },
+        likes: {
+            type: Number
+        },
+        reviews: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Review",
+            },
+        ],
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
     },
     isAdmin: {
         type: Boolean,
         default: false,
     },
-
-
 },
 
     {
         timestamps: true
     }
 )
+
+UserSchema.pre('save', function (next) {
+    if (this.seller_info.no_of_trades === 0) {
+        this.seller_info.percentage_of_completed_trades = 0;
+    } else {
+        this.seller_info.percentage_of_completed_trades = (this.seller_info.no_of_completed_trades / this.seller_info.no_of_trades) * 100;
+    }
+
+    if (!this.username) {
+        this.username = generateUsername(this.fullname);
+    }
+
+    next();
+});
+
+function generateUsername(fullname) {
+    let username = fullname.replace(/\s+/g, '').toLowerCase();
+    if (username.length > 10) {
+        username = username.substring(0, 10);
+    }
+    return username;
+}
 
 const User = mongoose.model("User", UserSchema);
 export default User;

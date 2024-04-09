@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { generateSerialNumber } from '../util/generateRandomNumber';
 const schema = mongoose.Schema;
 
 const p2pSystemTransactionSchema = new schema({
@@ -12,15 +13,20 @@ const p2pSystemTransactionSchema = new schema({
         ref: 'coin',
         required: true
     },
-    totalNumberOfCoinByUser: {
+    totalNumberOfCoin: {
         type: Number,
+        required: true
     },
     wallet_Address: {
-        type: String
+        type: String,
+        required: true
+    },
+    transcationDate: {
+        type: Date
     },
     serial_number: {
         type: String,
-        ref: 'Transactions'
+        default: generateSerialNumber()
     }
 }, { timestamps: true });
 

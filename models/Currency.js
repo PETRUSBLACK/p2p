@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 const schema = mongoose.Schema;
 
-const CoinSchema = new schema({
+const CurrencySchema = new schema({
     name: {
         type: String,
-        required: true
+        required: true,
     },
     symbol: {
         symbol_public_id: {
@@ -15,9 +15,9 @@ const CoinSchema = new schema({
             type: String,
             required: true
         }
-    }, 
-    limit: Number
+    }
+
 });
 
-const Coin = mongoose.model("Coin", CoinSchema);
-export default Coin;
+const Currency = mongoose.model("Currency", CurrencySchema);
+export default Currency;
