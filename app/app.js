@@ -13,7 +13,7 @@ import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import orderRoutes from "../routes/orderRoute.js";
 dbConnect();
 import { v2 as cloudinary } from 'cloudinary';
-
+import cors from "cors";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
