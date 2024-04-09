@@ -14,7 +14,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, phone, password } = req.body;
 
   if (!emailRegex.test(email)) {
-    return res.status(403).json({ "error": "Email is Invalid" })
+    return res.status(400).json({ "error": "Invalid email format" });
   }
 
   const isUserExists = await User.findOne({ email });
@@ -40,10 +40,6 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
   });
 
-  if (otp) {
-    console.log("Yes otp was created")
-  }
-
   res.status(201).json({
     status: "success",
     message: `Please check your email and sms ${user.fullname} for your otp's`,
@@ -68,6 +64,7 @@ export const otpVerification = asyncHandler(async (req, res) => {
       phone: userData.phone
     })
 
+    await OTP.findByIdAndDelete(otpData._id);
     initializeUserWallet(user._id)
 
     res.status(200).json({
@@ -89,7 +86,7 @@ export const resendOTP = asyncHandler(async (req, res) => {
   const otp = await OTP.findById(oldOtp)
 
   if(!otp){
-    res.status(400).json({ message: "Otp not found"})
+    res.status(404).json({ message: "Otp not found"})
   }
 
   const emailOtp = await generateEmailOTP(otp.user.email);
