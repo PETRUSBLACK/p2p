@@ -89,20 +89,20 @@ export const otpVerification = asyncHandler(async (req, res) => {
 
 export const resendOTP = asyncHandler(async (req, res) => {
   const { oldOtp, resendEmailOTP, resendSmsOTP } = req.body
-  
+
   const otp = await OTP.findById(oldOtp)
 
-  if(!otp){
-    res.status(404).json({ message: "Otp not found"})
+  if (!otp) {
+    res.status(404).json({ message: "Otp not found" })
   }
 
   const emailOtp = await generateEmailOTP(otp.user.email);
 
-  if(resendEmailOTP){
+  if (resendEmailOTP) {
     otp.otp.emailOTP = emailOtp
   }
 
-  if(resendSmsOTP){
+  if (resendSmsOTP) {
     otp.otp.smsOTP = emailOtp
   }
 
@@ -149,13 +149,21 @@ export const updatePassword = asyncHandler(async (req, res) => {
 export const loginUserContrl = asyncHandler(async (req, res) => {
   const { email, username, phone, password } = req.body;
 
-  const userFound = await User.findOne({ $or: [{ email }, { username }, { phone }] });
-
-  if (!userFound.password) {
-    throw new Error("Complete your registration process, your account has no password")
+  if (!password) {
+    return res.status(400).json({ message: "Password field should not be empty" });
   }
 
-  if (userFound && bcrypt.compare(password, userFound.password)) {
+  const userFound = await User.findOne({ $or: [{ email }, { username }, { phone }] });
+
+  if (!userFound) {
+    return res.status(404).json({ message: "Invalid email, username or phonenumber" });
+  }
+
+  if (!userFound.password) {
+    throw new Error("Continue with google, your account has no password")
+  }
+
+  if (userFound && (await bcrypt.compare(password, userFound?.password))) {
     res.json({
       status: "success",
       message: "User logged in successfully",
@@ -163,7 +171,7 @@ export const loginUserContrl = asyncHandler(async (req, res) => {
       token: generateToken(userFound._id),
     });
   } else {
-    throw new Error(`Invalid email or password`);
+    throw new Error(`Invalid email, username or phonenumber and password`);
   }
 
 });
