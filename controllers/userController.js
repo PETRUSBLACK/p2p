@@ -13,8 +13,16 @@ let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 export const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, phone, password } = req.body;
 
+  if (!(fullname && email && phone && password)) {
+    return res.status(400).json({ "error": "All fields are required" });
+  }
+
   if (!emailRegex.test(email)) {
     return res.status(400).json({ "error": "Invalid email format" });
+  }
+
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ "error": "Invalid password format" });
   }
 
   const isUserExists = await User.findOne({ email });
@@ -23,7 +31,6 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 
   const emailOTP = await generateEmailOTP(email)
-  // const smsOTP = await generateSmsOTP(phone)
 
   const user = {
     fullname,

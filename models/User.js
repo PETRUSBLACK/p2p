@@ -13,7 +13,7 @@ const UserSchema = new schema({
     },
     email: {
         type: String,
-        required: true,
+        required: [true, 'email is required'],
         lowercase: true,
         unique: true
     },
@@ -22,7 +22,6 @@ const UserSchema = new schema({
     },
     phone: {
         type: String,
-        required: true
     },
     username: {
         type: String,
