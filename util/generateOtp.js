@@ -1,7 +1,5 @@
 import nodemailer from 'nodemailer'
-import OTP from "../models/OTP.js";
 import { Vonage } from '@vonage/server-sdk';
-// const generatedOTP = Math.floor(100000 + Math.random() * 900000);
 
 export const generateEmailOTP = async (email) => {
     const generatedOTP = Math.floor(100000 + Math.random() * 900000);
@@ -18,7 +16,7 @@ export const generateEmailOTP = async (email) => {
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'OTP for Login',
-        text: `Your OTP for login is: ${generatedOTP}`,
+        text: `Your login code is: ${generatedOTP}. It expires in 5 minutes. Enter it quickly to secure your account.`,
     });
 
     console.log(generatedOTP)

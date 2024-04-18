@@ -16,8 +16,12 @@ const OTPSchema = new schema({
 	createdAt: {
 		type: Date,
 		default: Date.now,
-		expires: 60 * 5
 	},
+	expireAt: {
+    type: Date,
+    default: new Date(),
+    expires: 320,
+	}
 })
 
 const OTP = mongoose.model('OTP', OTPSchema);

@@ -72,7 +72,7 @@ export const otpVerification = asyncHandler(async (req, res) => {
     })
 
     await OTP.findByIdAndDelete(otpData._id);
-    initializeUserWallet(user._id)
+    initializeUserWallet(user._id);
 
     res.status(200).json({
       status: "success",
@@ -82,7 +82,7 @@ export const otpVerification = asyncHandler(async (req, res) => {
   } else {
     res.status(400).json({
       success: false,
-      message: "Invalid Otp"
+      message: "Invalid or expired Otp, please resend"
     });
   }
 })
