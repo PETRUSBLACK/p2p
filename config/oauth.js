@@ -19,7 +19,7 @@ passport.use(
             // check if user already signed up with email and password
             const userWithEmail = await User.findOne({ email: profile.email });
             if (userWithEmail) {
-              throw new Error("User with email already exists");
+              return userWithEmail;
             }
 
             const newUser = await User.create({
