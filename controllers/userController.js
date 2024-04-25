@@ -57,7 +57,12 @@ export const registerUser = asyncHandler(async (req, res) => {
 export const otpVerification = asyncHandler(async (req, res) => {
   const { emailOTP, smsOTP } = req.body;
 
-  const otpData = await OTP.findOne({ 'otp.emailOTP': emailOTP, 'otp.smsOTP': smsOTP }).exec();
+  const otpData = await OTP.findOne({
+    $or: [
+      { 'otp.emailOTP': emailOTP },
+      { 'otp.smsOTP': smsOTP }
+    ]
+  }).exec();
 
   if (otpData) {
     const userData = otpData.user
