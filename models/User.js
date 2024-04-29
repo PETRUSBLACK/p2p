@@ -70,7 +70,13 @@ const UserSchema = new schema({
     },
     googleId: {
         type: String
-    }
+    },
+    resetToken:{
+        type:String,
+    },
+    reseTokenExpiration:{
+        type:Date,
+    },
 },
 
     {
