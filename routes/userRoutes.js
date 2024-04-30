@@ -1,7 +1,7 @@
 import express from "express";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import isAdmin from "../middleware/isAdmin.js";
-import { otpVerification, loginUserContrl, userProfile, registerUser, updatePassword, resendOTP } from "../controllers/userController.js"
+import { otpVerification, loginUserContrl, userProfile, registerUser, updatePassword, resendOTP, forgetPasswordCtr, resetPasswordCtr } from "../controllers/userController.js"
 
 
 const userRoutes = express.Router();
@@ -214,5 +214,10 @@ userRoutes.put("/update-password", isLoggedIn, updatePassword);
 
 userRoutes.post("/login", loginUserContrl);
 userRoutes.get("/profile", isLoggedIn, userProfile);
+
+//forget password
+userRoutes.post("/forget-password", forgetPasswordCtr)
+//reset password
+userRoutes.post("/reset-password", resetPasswordCtr)
 
 export default userRoutes;
