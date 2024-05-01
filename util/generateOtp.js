@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 import { Vonage } from '@vonage/server-sdk';
 
-export const generateEmailOTP = async (email) => {
+export const generateOTP = async (email) => {
     const generatedOTP = Math.floor(100000 + Math.random() * 900000);
 
     const transporter = nodemailer.createTransport({
