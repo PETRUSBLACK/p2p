@@ -181,7 +181,7 @@ export const deleteSellList = asyncHandler(async (req, res) => {
 
 export const getAllSellListing = asyncHandler(async (req, res) => {
     try {
-        const sellLists = await SellList.find();
+        const sellLists = await SellList.find().populate('user cryptoCurrency');
 
         res.status(200).json({
             status: "success",
