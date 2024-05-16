@@ -275,3 +275,102 @@ export const forgetPasswordCtr = asyncHandler(async(req, res) => {
 
   })
 
+
+  //upload profile photo
+export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
+  
+      //find the user whose is uploading profile
+      const userProfileToBeUpdated = await User.findById(req.userAuth);
+      if(!userProfileToBeUpdated){
+          res.json({
+              status:"error",
+              message:"User not found"
+          })
+      }
+
+      //check if user is blocked
+      if(userProfileToBeUpdated.isBlocked){
+          return res.json({
+              status:"error",
+              message:"Access denied because your account is presently blocked"
+          })
+      }
+
+      console.log(req.file);
+      if(req.file){
+          await User.findByIdAndUpdate(req.userAuth,{
+              $set:{
+                  profilephoto:req.file.path
+              },
+          },{
+              new:true
+          }
+              );
+              res.json({
+                  status:"success",
+                  data:"profile image uploaded successfully"
+              })
+      }
+
+
+   
+}
+)
+
+  //update user profile
+  export const updateUserProfile = asyncHandler(async(req, res) => {
+    const{bio, location} = req.body;
+
+    const userProfile = await User.findById(req.userAuth)
+
+    if(!userProfile){
+      throw new Error('Invalid or the link expired')
+    }
+
+    const updateUser = await User.findByIdAndUpdate(
+      {
+      location,
+      bio
+    },
+    {
+      new: true
+    }
+  )
+
+  res.status(200).json({
+    status:"success",
+    message: "Profile Updated Successfully",
+    data:updateUser
+  })
+
+  })
+
+
+  //Admin update user profile
+  // export const adminUpdateUserProfile = asyncHandler(async(req, res) => {
+  //   const{ fullname, email, phone } = req.body;
+
+  //   const userProfile = await User.findById(req.userAuth)
+
+  //   if(!userProfile){
+  //     throw new Error('Invalid or the link expired')
+  //   }
+
+  //   const updateUser = await User.findByIdAndUpdate(
+  //     {
+  //     fullname,
+  //     email,
+  //     phone
+  //   },
+  //   {
+  //     new: true
+  //   }
+  // )
+
+  // res.status(200).json({
+  //   status:"success",
+  //   message: "Profile Updated Successfully",
+  //   data:updateUser
+  // })
+
+  // })

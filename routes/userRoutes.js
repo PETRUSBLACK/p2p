@@ -1,7 +1,11 @@
 import express from "express";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import isAdmin from "../middleware/isAdmin.js";
-import { otpVerification, loginUserContrl, userProfile, registerUser, updatePassword, resendOTP, forgetPasswordCtr, resetPasswordCtr } from "../controllers/userController.js"
+import { otpVerification, loginUserContrl, userProfile, registerUser, updatePassword, resendOTP, forgetPasswordCtr, resetPasswordCtr, updateUserProfile, profilePhotoUploadCtrl } from "../controllers/userController.js"
+import multer from "multer";
+import storage from "../config/profilePhotoUpload.js";
+
+const upload = multer({storage})
 
 
 const userRoutes = express.Router();
@@ -219,5 +223,9 @@ userRoutes.get("/profile", isLoggedIn, userProfile);
 userRoutes.post("/forget-password", forgetPasswordCtr)
 //reset password
 userRoutes.post("/reset-password", resetPasswordCtr)
+//upload profile photo
+userRoutes.post("/profile-image", isLoggedIn, upload.single("profile"), profilePhotoUploadCtrl)
+//update userProfile
+userRoutes.put("/", isLoggedIn, updateUserProfile)
 
 export default userRoutes;
