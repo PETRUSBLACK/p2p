@@ -28,6 +28,12 @@ const UserSchema = new schema({
         minlength: [3, 'Username must be 3 letters long'],
         unique: true
     },
+    // profile_img: {
+    //     type: String,
+    //     default: () => {
+    //         return `https://api.dicebear.com/6.x/${profile_imgs_collections_list[Math.floor(Math.random() * profile_imgs_collections_list.length)]}/svg?seed=${profile_imgs_name_list[Math.floor(Math.random() * profile_imgs_name_list.length)]}`
+    //     }
+    // },
     profile_img: {
         type: String,
         default: () => {
@@ -36,9 +42,11 @@ const UserSchema = new schema({
     },
     bio: {
         type: String,
+        //default: "Thanks"
     },
     location: {
         type: String,
+        //default: "Nigerian"
     },
     seller_info: {
         no_of_trades: {
@@ -67,6 +75,10 @@ const UserSchema = new schema({
     isAdmin: {
         type: Boolean,
         default: false,
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false
     },
     googleId: {
         type: String

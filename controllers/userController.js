@@ -276,6 +276,9 @@ export const forgetPasswordCtr = asyncHandler(async(req, res) => {
   })
 
 
+
+
+
   //upload profile photo
 export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
   
@@ -296,11 +299,11 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
           })
       }
 
-      console.log(req.file);
+      //console.log(req.file);
       if(req.file){
           await User.findByIdAndUpdate(req.userAuth,{
               $set:{
-                  profilephoto:req.file.path
+                profile_img:req.file.path
               },
           },{
               new:true
@@ -317,20 +320,24 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
 }
 )
 
+
   //update user profile
   export const updateUserProfile = asyncHandler(async(req, res) => {
     const{bio, location} = req.body;
 
-    const userProfile = await User.findById(req.userAuth)
+    const profileId = req.params.id
+
+    const userProfile = await User.findById(profileId)
 
     if(!userProfile){
-      throw new Error('Invalid or the link expired')
+      throw new Error('user dose not exist')
     }
 
-    const updateUser = await User.findByIdAndUpdate(
+    const updatedUserProfile = await User.findByIdAndUpdate(
+      profileId,
       {
-      location,
-      bio
+      bio,
+      location
     },
     {
       new: true
@@ -339,8 +346,7 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
 
   res.status(200).json({
     status:"success",
-    message: "Profile Updated Successfully",
-    data:updateUser
+    message: "Profile Updated Successfully"
   })
 
   })
@@ -348,18 +354,22 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
 
   //Admin update user profile
   // export const adminUpdateUserProfile = asyncHandler(async(req, res) => {
-  //   const{ fullname, email, phone } = req.body;
+  //   const{ fullname, email, username, phone } = req.body;
 
-  //   const userProfile = await User.findById(req.userAuth)
+  //   const userId = req.params.id
 
-  //   if(!userProfile){
-  //     throw new Error('Invalid or the link expired')
+  //   const userProfileId = await User.findById(userId)
+
+  //   if(!userProfileId){
+  //     throw new Error('User dose not exist')
   //   }
 
   //   const updateUser = await User.findByIdAndUpdate(
+  //     userProfileId,
   //     {
   //     fullname,
   //     email,
+  //     username,
   //     phone
   //   },
   //   {
@@ -369,7 +379,7 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
 
   // res.status(200).json({
   //   status:"success",
-  //   message: "Profile Updated Successfully",
+  //   message: "UserProfile Updated Successfully",
   //   data:updateUser
   // })
 
