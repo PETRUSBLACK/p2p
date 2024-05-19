@@ -353,34 +353,34 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
 
 
   //Admin update user profile
-  // export const adminUpdateUserProfile = asyncHandler(async(req, res) => {
-  //   const{ fullname, email, username, phone } = req.body;
+  export const adminUpdateUserProfile = asyncHandler(async(req, res) => {
+    const{ fullname, email, username, phone } = req.body;
 
-  //   const userId = req.params.id
+    const userId = req.params.id
 
-  //   const userProfileId = await User.findById(userId)
+    const userProfileId = await User.findById(userId)
 
-  //   if(!userProfileId){
-  //     throw new Error('User dose not exist')
-  //   }
+    if(!userProfileId){
+      throw new Error('User dose not exist')
+    }
 
-  //   const updateUser = await User.findByIdAndUpdate(
-  //     userProfileId,
-  //     {
-  //     fullname,
-  //     email,
-  //     username,
-  //     phone
-  //   },
-  //   {
-  //     new: true
-  //   }
-  // )
+    const updateUser = await User.findByIdAndUpdate(
+      userProfileId,
+      {
+      fullname,
+      email,
+      username,
+      phone
+    },
+    {
+      new: true
+    }
+  )
 
-  // res.status(200).json({
-  //   status:"success",
-  //   message: "UserProfile Updated Successfully",
-  //   data:updateUser
-  // })
+  res.status(200).json({
+    status:"success",
+    message: "UserProfile Updated Successfully",
+    data:updateUser
+  })
 
-  // })
+  })
