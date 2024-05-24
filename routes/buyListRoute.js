@@ -6,12 +6,12 @@ const buyListRoutes = express.Router();
 
 /**
  * @swagger
- * /api/v1/u:
+ * /api/v1/:
  *   post:
  *     summary: The permits users to log in
  *     description: This is the endpoint to log in
  *  *     tags:
- *       - users
+ *       - buycoin
  *     requestBody:
  *       required: true
  *       content:
@@ -20,16 +20,16 @@ const buyListRoutes = express.Router();
  *             $ref: '#/components/schemas/Buy'
  *      responses:
  *        '201':
- *          description: Please check your email and sms for your otp's
+ *          description: Successful
  *        '400':
- *          description: Bad request. Invalid email format.
+ *          description: Bad request. 
  *        '409':
- *          description: Conflict. User with provided email already exists.
+ *          description: Conflict. 
  *        '500':
  *          description: Internal server error
  *  * components:
     *   schemas:
-    *     User:
+    *     BuyCoin:
     *       type: object
     *       properties:
     *         cryptoCurrencyName:
