@@ -10,7 +10,7 @@ const buyListRoutes = express.Router();
  *   post:
  *     summary: The permits users to log in
  *     description: This is the endpoint to log in
- *  *     tags:
+ *     tags:
  *       - buycoin
  *     requestBody:
  *       required: true
@@ -27,29 +27,29 @@ const buyListRoutes = express.Router();
  *          description: Conflict. 
  *        '500':
  *          description: Internal server error
- *  * components:
-    *   schemas:
-    *     BuyCoin:
-    *       type: object
-    *       properties:
-    *         cryptoCurrencyName:
-    *           type: string
-    *         fiatCurrency:
-    *           type: string
-    *         pricePerCoin:
-    *           type: string
-    *         totalAmountOfCrypto:
-    *           type: string
-    *         rangeMin:
-    *           type: string
-    *         rangeMax:
-    *           type: string
-    *         paymentTimeLimit:
-    *           type: string
-    *         fee:
-    *           type: string
-    *         details:
-    *           type: string
+ * components:
+ *   schemas:
+ *     BuyCoin:
+ *       type: object
+ *       properties:
+ *         cryptoCurrencyName:
+ *           type: string
+ *         fiatCurrency:
+ *           type: string
+ *         pricePerCoin:
+ *           type: string
+ *         totalAmountOfCrypto:
+ *           type: string
+ *         rangeMin:
+ *           type: string
+ *         rangeMax:
+ *           type: string
+ *         paymentTimeLimit:
+ *           type: string
+ *         fee:
+ *           type: string
+ *         details:
+ *           type: string
  */
 
 buyListRoutes.post("/buylist", isLoggedIn, createBuyListValidationRules(), createBuyList);
