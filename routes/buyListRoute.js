@@ -29,7 +29,7 @@ const buyListRoutes = express.Router();
  *          description: Internal server error
  * components:
  *   schemas:
- *     BuyCoin:
+ *     BuyList:
  *       type: object
  *       properties:
  *         cryptoCurrencyName:
