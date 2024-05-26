@@ -423,17 +423,21 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
         throw new Error('User not found')
       }
 
+      if(!userToBeUnBlock.isBlocked){
+        throw new Error('you have not blocked this user')
+      }
+
       const adminUser = await User.findById(req.userAuth)
 
       //CHANGE isBlock to true
-      userToBeBlock.isBlocked = true;
+      userToBeUnBlock.isBlocked = false;
       //save the changes
-      await userToBeBlock.save()
+      await userToBeUnBlock.save()
       
       
     res.status(200).json({
       status:"success",
-      data: `{adminUser.fullname}, You have blocked the user successfully`
+      data: `You have unblocked this user`
     })
   
     })

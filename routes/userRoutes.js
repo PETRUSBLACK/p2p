@@ -11,7 +11,9 @@ import { otpVerification,
     resetPasswordCtr, 
     updateUserProfile, 
     profilePhotoUploadCtrl, 
-    adminUpdateUserProfile} from "../controllers/userController.js"
+    adminUpdateUserProfile,
+    adminBlockUserCtrl,
+    adminUnBlockUserCtrl} from "../controllers/userController.js"
 import multer from "multer";
 import storage from "../config/profilePhotoUpload.js";
 
@@ -416,7 +418,14 @@ userRoutes.post("/profile-image/", isLoggedIn, upload.single("profile"), profile
 userRoutes.put("/update-profile/:id", isLoggedIn, updateUserProfile)
 
 
+//FOR ADMIN
 //admin update user
 userRoutes.put("/admin-update-user/:id", isLoggedIn, isAdmin, adminUpdateUserProfile)
+
+//admin block user
+userRoutes.put("/admin-block-user/:id", isLoggedIn, isAdmin, adminBlockUserCtrl)
+
+//admin unblock user
+userRoutes.put("/admin-unblock-user/:id", isLoggedIn, isAdmin, adminUnBlockUserCtrl)
 
 export default userRoutes;
