@@ -15,6 +15,7 @@ import { otpVerification,
 import multer from "multer";
 import storage from "../config/profilePhotoUpload.js";
 
+
 const upload = multer({storage})
 
 
@@ -227,16 +228,194 @@ userRoutes.put("/update-password", isLoggedIn, updatePassword);
  */
 
 userRoutes.post("/login", loginUserContrl);
+
+
+// /**
+//  * @swagger
+//  * /api/v1/users/profile:
+//  *   get:
+//  *     summary: Retrieve user profile
+//  *     security:
+//  *       - ApiKeyAuth: []
+//  *       - bearerAuth: []
+//  *       - customHeaderAuth: []
+//  *     responses:
+//  *       200:
+//  *         description: A user profile
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 id:
+//  *                   type: string
+//  *                   description: The user ID
+//  *                 name:
+//  *                   type: string
+//  *                   description: The user's name
+//  *                 email:
+//  *                   type: string
+//  *                   description: The user's email
+//  *       401:
+//  *         description: Unauthorized
+//  */
+
 userRoutes.get("/profile", isLoggedIn, userProfile);
+
+
+
+/**
+ * @swagger
+ * /api/v1/users/forget-password:
+ *   post:
+ *     summary: Create new password if user forget their password
+ *     description: This endpoint enable user create new password which an email will be send to the user to click an reset password.
+ *     tags:
+ *       - users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Password reset sent successfully to your email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Password reset sent successfully to your email
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: Invalid or the link expired
+ *       '500':
+ *         description: Internal server error
+ */
 
 //forget password
 userRoutes.post("/forget-password", forgetPasswordCtr)
+
+
+
+/**
+ * @swagger
+ * /api/v1/users/reset-password:
+ *   post:
+ *     summary: Confirm the link send to your email
+ *     description: Click the link send to your email to complete password reset process.
+ *     tags:
+ *       - users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               resetToken:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: password updated successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: Invalid or the link expired
+ *       '500':
+ *         description: Internal server error
+ */
+
 //reset password
 userRoutes.post("/reset-password", resetPasswordCtr)
+
+
+
+/**
+ * @swagger
+ * /api/v1/users/update-profile/{id}:
+ *   post:
+ *     summary: Upload profile photo
+ *     tags:
+ *       - users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profile_img:
+ *                 type: string
+ *                 format: binary
+ *                 id:
+ *                   type: string
+ *                   description: The user ID
+ *     responses:
+ *       200:
+ *         description: Profile photo uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *                 filePath:
+ *                   type: string
+ *                   description: Path of the uploaded file
+ *                 id:
+ *                   type: string
+ *                   description: ID of the logged-in user
+ *       400:
+ *         description: Bad Request
+ *       401:
+ *         description: Unauthorized
+ */
+
 //upload profile photo
-userRoutes.post("/profile-image", isLoggedIn, upload.single("profile"), profilePhotoUploadCtrl)
+userRoutes.post("/profile-image/", isLoggedIn, upload.single("profile"), profilePhotoUploadCtrl)
+
+
+
+
+
 //update userProfile
 userRoutes.put("/update-profile/:id", isLoggedIn, updateUserProfile)
+
+
 //admin update user
 userRoutes.put("/admin-update-user/:id", isLoggedIn, isAdmin, adminUpdateUserProfile)
 

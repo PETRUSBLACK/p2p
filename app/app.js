@@ -67,11 +67,60 @@ const /* `swaggerOptions` is an object that defines the configuration options fo
         },
         server: ["http://localhost:3000"],
       },
+      
       schemes: ["http", "https"],
 
     },
     apis: ["./routes/*.js"],
   };
+
+
+  // swaggerOptions = {
+  //   swaggerDefinition: {
+  //     openapi: "3.0.0",
+  //     info: {
+  //       title: "P2P Cryptocurrency Exchange",
+  //       version: "1.0.0",
+  //       description:
+  //         "This is a backend api documentation for P2P Cryptocurrency application",
+  //       contact: {
+  //         name: "Stringcode Limited",
+  //       },
+  //       server: ["http://localhost:3000"],
+  //     },
+  //     components: {
+  //       securitySchemes: {
+  //         ApiKeyAuth: {
+  //           type: 'apiKey',
+  //           in: 'header',
+  //           name: 'X-API-KEY',
+  //         },
+  //         bearerAuth: {
+  //           type: 'http',
+  //           scheme: 'bearer',
+  //           bearerFormat: 'JWT',
+  //         },
+  //         customHeaderAuth: {
+  //           type: 'apiKey',
+  //           in: 'header',
+  //           name: 'X-CUSTOM-HEADER',
+  //         },
+  //       },
+  //     },
+  //     security: [
+  //       {
+  //         ApiKeyAuth: [],
+  //         bearerAuth: [],
+  //         customHeaderAuth: [],
+  //       },
+  //     ],
+      
+  //     schemes: ["http", "https"],
+
+  //   },
+  //   apis: ["./routes/*.js"],
+  // };
+  
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

@@ -172,7 +172,8 @@ export const userProfile = asyncHandler(async (req, res) => {
   res.json({
     status: "success",
     message: "User profile fetched successfully",
-    userFound
+    userFound,
+
   });
 });
 
@@ -352,6 +353,10 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
   })
 
 
+
+
+
+
   //Admin update user profile
   export const adminUpdateUserProfile = asyncHandler(async(req, res) => {
     const{ fullname, email, username, phone } = req.body;
@@ -384,3 +389,51 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
   })
 
   })
+
+
+    //Admin block user
+    export const adminBlockUserCtrl = asyncHandler(async(req, res) => {
+      const userToBeBlock = await User.findById(req.params.id);
+  
+      if(!userToBeBlock){
+        throw new Error('User not found')
+      }
+
+      const adminUser = await User.findById(req.userAuth)
+
+      //CHANGE isBlock to true
+      userToBeBlock.isBlocked = true;
+      //save the changes
+      await userToBeBlock.save()
+      
+      
+    res.status(200).json({
+      status:"success",
+      data: `{adminUser.fullname}, You have blocked the user successfully`
+    })
+  
+    })
+
+    
+     //Admin unblock user
+     export const adminUnBlockUserCtrl = asyncHandler(async(req, res) => {
+      const userToBeUnBlock = await User.findById(req.params.id);
+  
+      if(!userToBeUnBlock){
+        throw new Error('User not found')
+      }
+
+      const adminUser = await User.findById(req.userAuth)
+
+      //CHANGE isBlock to true
+      userToBeBlock.isBlocked = true;
+      //save the changes
+      await userToBeBlock.save()
+      
+      
+    res.status(200).json({
+      status:"success",
+      data: `{adminUser.fullname}, You have blocked the user successfully`
+    })
+  
+    })
