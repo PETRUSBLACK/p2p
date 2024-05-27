@@ -47,11 +47,15 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
   });
 
+  console.log(otp)
+
   res.status(201).json({
     status: "success",
     message: `Please check your email and sms ${user.fullname} for your otp's`,
     otpIdForResendingOtp: otp._id
   });
+  console.log(user)
+  console.log(email)
 });
 
 export const otpVerification = asyncHandler(async (req, res) => {

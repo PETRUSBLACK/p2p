@@ -5,6 +5,7 @@ import Coin from "../models/coin.js";
 import Transactions from "../models/Transactions.js";
 import PaymentAccount from "../models/paymentAccount.js";
 import Notification from "../models/Notification.js";
+import Wallet from "../models/Wallet.js";
 
 export const createOrder = asyncHandler(async (req, res) => {
     const { totalFiatAmountToPay, totalQuantityOfCryptoBought } = req.body;
@@ -19,7 +20,18 @@ export const createOrder = asyncHandler(async (req, res) => {
 
         const coin = await Coin.findById(sellList.cryptoCurrency);
 
-        const account = await PaymentAccount.findById(sellList.accountInfoForTransaction)
+        const account = await PaymentAccount.findById(sellList.accountInfoForTransaction);
+
+        const wallet = await Wallet.findOne({ userId: sellList.user });
+
+        if (!wallet) {
+            return res.status(404).json({ message: "Seller's wallet not found" });
+        }
+
+        const coinInWallet = wallet.coins.find(coinItem => coinItem.coin.toString() === coin._id.toString());
+        if (!coinInWallet || coinInWallet.quantity < totalQuantityOfCryptoBought) {
+            return res.status(404).json({ message: "Seller does not have enough coins for the order" });
+        }
 
         const order = await Order.create({
             seller: sellList.user,
