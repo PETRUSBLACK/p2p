@@ -6,9 +6,7 @@ export const googleCallBack = asyncHandler(async (req, res) => {
       throw new Error("Login Failed");
     }
 
-    res.json({
-      status: "success",
-      message: "User logged in successfully",
-      token: generateToken(req.user._id)
-    });
-})
+    const token = generateToken(req.user.__id);
+
+    res.redirect(`https://p2p-system.netlify.app/login?token=${token}`);
+});

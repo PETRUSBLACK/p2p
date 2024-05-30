@@ -70,7 +70,13 @@ const UserSchema = new schema({
     },
     googleId: {
         type: String
-    }
+    },
+    resetToken:{
+        type:String,
+    },
+    reseTokenExpiration:{
+        type:Date,
+    },
 },
 
     {
@@ -78,7 +84,7 @@ const UserSchema = new schema({
     }
 )
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', async function (next) {
     if (this.seller_info.no_of_trades === 0) {
         this.seller_info.percentage_of_completed_trades = 0;
     } else {
@@ -86,17 +92,28 @@ UserSchema.pre('save', function (next) {
     }
 
     if (!this.username) {
-        this.username = generateUsername(this.fullname);
+        this.username = await generateUsername(this.fullname);
     }
 
     next();
 });
 
-function generateUsername(fullname) {
-    let username = fullname.replace(/\s+/g, '').toLowerCase();
-    if (username.length > 10) {
-        username = username.substring(0, 10);
+async function generateUsername(fullname) {
+    let baseUsername = fullname.replace(/\s+/g, '').toLowerCase();
+    if (baseUsername.length > 10) {
+        baseUsername = baseUsername.substring(0, 10);
     }
+
+    let username = baseUsername;
+    let count = 1;
+
+    // Check if username exists
+    while (await User.findOne({ username })) {
+        // If username exists, append count and increment count
+        username = baseUsername + count;
+        count++;
+    }
+
     return username;
 }
 

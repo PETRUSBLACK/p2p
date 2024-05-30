@@ -4,8 +4,10 @@ import Wallet from "../models/Wallet.js";
 import OTP from "../models/OTP.js";
 import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
-import { generateEmailOTP, generateSmsOTP } from "../util/generateOtp.js";
+import { generateOTP, generateSmsOTP } from "../util/generateOtp.js";
 import { generateToken, verifyToken } from "../util/jwtUtils.js";
+import sendEmail from "../util/emailUtil.js";
+import jwt from 'jsonwebtoken'
 
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -30,7 +32,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Email already in use" });
   }
 
-  const emailOTP = await generateEmailOTP(email)
+  const otp = await generateOTP(email)
 
   const user = {
     fullname,
@@ -39,29 +41,23 @@ export const registerUser = asyncHandler(async (req, res) => {
     password
   }
 
-  const otp = await OTP.create({
-    user,
-    otp: {
-      emailOTP: emailOTP,
-      smsOTP: emailOTP
-    }
-  });
+  const generatedOTP = await OTP.create({ user, otp });
 
   console.log(otp)
 
   res.status(201).json({
     status: "success",
-    message: `Please check your email and sms ${user.fullname} for your otp's`,
-    otpIdForResendingOtp: otp._id
+    message: `Please check your email or sms ${user.fullname} for your otp`,
+    otpIdForResendingOtp: generatedOTP._id
   });
   console.log(user)
   console.log(email)
 });
 
 export const otpVerification = asyncHandler(async (req, res) => {
-  const { emailOTP, smsOTP } = req.body;
+  const { otp } = req.body;
 
-  const otpData = await OTP.findOne({ 'otp.emailOTP': emailOTP, 'otp.smsOTP': smsOTP }).exec();
+  const otpData = await OTP.findOne({ otp });
 
   if (otpData) {
     const userData = otpData.user
@@ -92,29 +88,23 @@ export const otpVerification = asyncHandler(async (req, res) => {
 })
 
 export const resendOTP = asyncHandler(async (req, res) => {
-  const { oldOtp, resendEmailOTP, resendSmsOTP } = req.body
-
+  const { oldOtp } = req.body
   const otp = await OTP.findById(oldOtp)
 
   if (!otp) {
     res.status(404).json({ message: "Otp not found" })
   }
 
-  const emailOtp = await generateEmailOTP(otp.user.email);
+  const newOtp = await generateOTP(otp.user.email);
 
-  if (resendEmailOTP) {
-    otp.otp.emailOTP = emailOtp
-  }
-
-  if (resendSmsOTP) {
-    otp.otp.smsOTP = emailOtp
-  }
+  // update otp field in previous otp
+  otp.otp = newOtp;
 
   await otp.save();
 
   res.status(200).json({
     status: true,
-    message: resendEmailOTP ? `${otp.user.fullname} please check your email for your new otp` : `${otp.user.fullname} please check your sms for your new otp`
+    message: `${otp.user.fullname} please check your email or sms for your new otp`
   })
 });
 
@@ -214,3 +204,78 @@ async function initializeUserWallet(userId) {
     throw error;
   }
 }
+
+
+
+//FORGET PASSWORD
+export const forgetPasswordCtr = asyncHandler(async(req, res) => {
+    
+      const {email} = req.body;
+      //check if email is valid
+      const user = await User.findOne({email});
+      if(!user){
+        throw new Error(`user with ${email} does not exist`)
+      }
+
+      //generate a reset token
+      const resetToken = jwt.sign({userId: user._id}, process.env.JWT_KEY,{
+        expiresIn:'1h'
+      })
+
+      //set the  reset token and its expiration on the user obj
+
+      user.resetToken = resetToken;
+      user.reseTokenExpiration = Date.now() + 3600000;
+      
+      user.save()
+      //send password reset email
+      const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+      const html = `<h3>RESET PASSWORD</h3><br/> Below is the link to reset your password<br>This link only valid for 1 hour, please do not share with anyone<hr/><br/>click <strong><a href='${resetUrl}'>here</a></strong> to reset your password</p><p>Having any issue? kindly contact our support team</p>`
+      await sendEmail(user.email,'Reset Your Password', html);
+
+      //console.log(resetUrl);
+
+      res.status(200).json({
+        status:"success",
+        message:`Password reset sent successfully to your email ${user.email}` 
+      });
+
+  })
+
+
+
+  //RESET PASSWORD
+  export const resetPasswordCtr = asyncHandler(async(req, res) => {
+    
+      const {resetToken,password} =req.body;
+      //find the user with token
+      const user = await User.findOne({
+        resetToken,
+        reseTokenExpiration: {$gt: Date.now()},
+      })
+
+      if(!user){
+        throw new Error('Invalid or the link expired')
+      }
+
+      //hash
+      const salt = await bcrypt.genSalt(10);
+      const hashPassword = await bcrypt.hash(password,salt);
+
+      //Update user obj
+      user.password = hashPassword;
+      user.resetToken = undefined;
+      user.reseTokenExpiration = undefined
+
+      await user.save();
+
+      res.status(200).json({
+        status:"success",
+        message:"Your password reset successfully"
+      });
+
+      const html = `<h3>success</h3><br/> <p>Your password changed successfully</p>`
+      await sendEmail(user.email,'Password Message', html);
+
+  })
+
