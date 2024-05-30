@@ -13,8 +13,7 @@ const BuySchema = new schema({
         required: true
     },
     fiatCurrency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Currency",
+        type: String,
         required: true
     },
     pricePerCoin: {

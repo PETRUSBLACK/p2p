@@ -10,12 +10,14 @@ import sellListRoutes from "../routes/sellListRoute.js";
 import paymentAccountRoutes from "../routes/paymentAccountRoute.js";
 import buyListRoutes from "../routes/buyListRoute.js";
 import oauthRoutes from "../routes/oauthRoutes.js";
+import adminRoutes from "../routes/adminRoute.js";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import orderRoutes from "../routes/orderRoute.js";
 import { v2 as cloudinary } from 'cloudinary';
 import cors from "cors";
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsdoc from "swagger-jsdoc";
+import isAdmin from "../middleware/isAdmin.js";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -83,6 +85,7 @@ app.use("/api/v1/sellList", isLoggedIn, sellListRoutes);
 app.use("/api/v1/buyList", isLoggedIn, buyListRoutes);
 app.use("/api/v1/paymentAccount", isLoggedIn, paymentAccountRoutes);
 app.use("/api/v1/order", isLoggedIn, orderRoutes);
+app.use("/api/v1/admin" ,isLoggedIn, isAdmin,adminRoutes);
 
 app.use(notFound);
 app.use(globalError);
