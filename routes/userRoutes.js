@@ -220,4 +220,6 @@ userRoutes.post("/forget-password", forgetPasswordCtr)
 //reset password
 userRoutes.post("/reset-password", resetPasswordCtr)
 
+userRoutes.delete("/delete", isLoggedIn,deleteUser);
+
 export default userRoutes;

@@ -275,3 +275,27 @@ export const forgetPasswordCtr = asyncHandler(async(req, res) => {
 
   })
 
+  export const deleteUser = asyncHandler(async (req, res) => {
+
+    try {
+      const userFound = await User.findById(req.userAuth);
+      if (!userFound) {
+          return res.status(404).json({ message: "User could not be found" });
+      }
+  
+      const  deleteUser = await User.findByIdAndDelete(req.userAuth);
+  
+  if (!deleteUser) {
+          return res.status(404).json({ message: "Error in deleting" });
+      }
+      res.status(200).json({
+          status: "success",
+          message: "User deleted successfully",
+          data: unblockedUser 
+      });
+  }
+  catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+  }
+   });

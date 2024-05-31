@@ -176,3 +176,30 @@ export const unBlockUser = asyncHandler(async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+export const deleteUser = asyncHandler(async (req, res) => {
+
+    const userId = req.params.id;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User could not be found" });
+        }
+
+        const  deleteUser = await User.findByIdAndDelete(userId);
+
+  if (!deleteUser) {
+            return res.status(404).json({ message: "Error in deleting" });
+        }
+        res.status(200).json({
+            status: "success",
+            message: "User deleted successfully",
+            data: unblockedUser 
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
