@@ -6,7 +6,7 @@ const buyListRoutes = express.Router();
 
 /**
  * @swagger
- * /api/v1/:
+ * /api/v1/buyList/:
  *   post:
  *     summary: The permits users to log in
  *     description: This is the endpoint to log in
@@ -52,7 +52,7 @@ const buyListRoutes = express.Router();
  *           type: string
  */
 
-buyListRoutes.post("/buylist", isLoggedIn, createBuyListValidationRules(), createBuyList);
+buyListRoutes.post("/", isLoggedIn, createBuyListValidationRules(), createBuyList);
 
 buyListRoutes.put("/buylist/:id", isLoggedIn, updateBuyListValidationRules(), updateBuyList);
 buyListRoutes.delete("/buylist/:id", isLoggedIn, deleteBuyList);
