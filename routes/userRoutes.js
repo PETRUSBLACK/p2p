@@ -156,6 +156,61 @@ userRoutes.post("/verifyotp", otpVerification);
 userRoutes.put('/resendOtp', resendOTP)
 userRoutes.put("/update-password", isLoggedIn, updatePassword);
 
+/**
+ * @swagger
+ * /api/v1/users/login:
+ *   post:
+ *     summary: User Login
+ *     description: Authenticate and log in a user.
+ *     tags:
+ *       - users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginPayload'
+ *     responses:
+ *       '200':
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+ *               user:
+ *                 userId: 123
+ *                 fullName: John Doe
+ *                 email: john.doe@example.com
+ *       '400':
+ *         description: Invalid input or credentials
+ *       '401':
+ *         description: Unauthorized - Invalid credentials
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ *
+ * components:
+ *   schemas:
+ *     LoginPayload:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *         password:
+ *           type: string
+ *           format: password
+ *         username:
+ *           type: string
+ *           format: email
+ *         phone:
+ *           type: string
+ *           format: password
+ *       required:
+ *         - email || username || phone
+ *         - password
+ */
 
 userRoutes.post("/login", loginUserContrl);
 userRoutes.get("/profile", isLoggedIn, userProfile);
