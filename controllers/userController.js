@@ -168,11 +168,18 @@ export const loginUserContrl = asyncHandler(async (req, res) => {
 
 export const userProfile = asyncHandler(async (req, res) => {
   const userFound = await User.findById(req.userAuth);
-
   res.json({
     status: "success",
     message: "User profile fetched successfully",
-    userFound,
+    userFound:{
+    profile_img: userFound.profile_img,
+    fullname: userFound.fullname,
+    username: userFound.username,
+    email: userFound.email,
+    phone: userFound.phone,
+    location: userFound.location,
+    bio: userFound.bio
+  }
 
   });
 });

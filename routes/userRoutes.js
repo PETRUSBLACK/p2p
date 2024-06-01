@@ -220,7 +220,7 @@ userRoutes.put("/update-password", isLoggedIn, updatePassword);
  *           format: password
  *         username:
  *           type: string
- *           format: email
+ *           format: username
  *         phone:
  *           type: string
  *           format: password
@@ -232,35 +232,37 @@ userRoutes.put("/update-password", isLoggedIn, updatePassword);
 userRoutes.post("/login", loginUserContrl);
 
 
-// /**
-//  * @swagger
-//  * /api/v1/users/profile:
-//  *   get:
-//  *     summary: Retrieve user profile
-//  *     security:
-//  *       - ApiKeyAuth: []
-//  *       - bearerAuth: []
-//  *       - customHeaderAuth: []
-//  *     responses:
-//  *       200:
-//  *         description: A user profile
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               type: object
-//  *               properties:
-//  *                 id:
-//  *                   type: string
-//  *                   description: The user ID
-//  *                 name:
-//  *                   type: string
-//  *                   description: The user's name
-//  *                 email:
-//  *                   type: string
-//  *                   description: The user's email
-//  *       401:
-//  *         description: Unauthorized
-//  */
+/**
+ * @swagger
+ * /api/v1/users/profile:
+ *   get:
+ *     summary: Retrieve user profile
+ *     tags:
+ *       - users
+ *     security:
+ *       - ApiKeyAuth: []
+ *       - bearerAuth: []
+ *       - customHeaderAuth: []
+ *     responses:
+ *       200:
+ *         description: A user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: The user ID
+ *                 name:
+ *                   type: string
+ *                   description: The user's name
+ *                 email:
+ *                   type: string
+ *                   description: The user's email
+ *       401:
+ *         description: Unauthorized
+ */
 
 userRoutes.get("/profile", isLoggedIn, userProfile);
 
@@ -355,12 +357,43 @@ userRoutes.post("/forget-password", forgetPasswordCtr)
 userRoutes.post("/reset-password", resetPasswordCtr)
 
 
+// Upload profile photo endpoint
+
+
+/**
+ * @swagger
+ * /api/v1/users/profile-image:
+ *   post:
+ *     summary: Upload user profile photo
+ *     description: Upload a profile photo for a user.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profile:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Profile photo uploaded successfully
+ *       400:
+ *         description: Invalid input
+ */
+
+//upload profile photo
+userRoutes.post("/profile-image", isLoggedIn, upload.single("profile"), profilePhotoUploadCtrl)
+
+
 
 /**
  * @swagger
  * /api/v1/users/update-profile/{id}:
- *   post:
- *     summary: Upload profile photo
+ *   put:
+ *     summary: Update user profile
+ *     description: Update the profile information of a user by their ID.
  *     tags:
  *       - users
  *     parameters:
@@ -370,49 +403,25 @@ userRoutes.post("/reset-password", resetPasswordCtr)
  *         schema:
  *           type: string
  *         description: The user ID
- *     security:
- *       - bearerAuth: []
  *     requestBody:
+ *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               profile_img:
+ *               bio:
  *                 type: string
- *                 format: binary
- *                 id:
- *                   type: string
- *                   description: The user ID
+ *               location:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Profile photo uploaded successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Success message
- *                 filePath:
- *                   type: string
- *                   description: Path of the uploaded file
- *                 id:
- *                   type: string
- *                   description: ID of the logged-in user
+ *         description: User profile updated successfully
  *       400:
- *         description: Bad Request
- *       401:
- *         description: Unauthorized
+ *         description: Invalid input
+ *       404:
+ *         description: User not found
  */
-
-//upload profile photo
-userRoutes.post("/profile-image/", isLoggedIn, upload.single("profile"), profilePhotoUploadCtrl)
-
-
-
-
 
 //update userProfile
 userRoutes.put("/update-profile/:id", isLoggedIn, updateUserProfile)
