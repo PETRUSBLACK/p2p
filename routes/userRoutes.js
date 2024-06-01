@@ -217,7 +217,68 @@ userRoutes.get("/profile", isLoggedIn, userProfile);
 
 //forget password
 userRoutes.post("/forget-password", forgetPasswordCtr)
-//reset password
+/**
+ * @swagger
+ * /api/v1/users/reset-password:
+ *   post:
+ *     summary: Resend OTP
+ *     description: Resend OTP for user registration process.
+ *     tags:
+ *       - users
+ *     parameters:
+ *       - name: oldOtp
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 6082347c71d89200154eaad4
+ *       - name: resendEmailOTP
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: true
+ *       - name: resendSmsOTP
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *     responses:
+ *       '200':
+ *         description: OTP resent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: John Doe please check your email for your new otp
+ *       '404':
+ *         description: Otp not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Otp not found
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal server error
+ */
 userRoutes.post("/reset-password", resetPasswordCtr)
 
 export default userRoutes;
