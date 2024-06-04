@@ -6,34 +6,34 @@ const buyListRoutes = express.Router();
 
 /**
  * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *   schemas:
- *     BuyList:
- *       type: object
- *       properties:
- *         cryptoCurrencyName:
- *           type: string
- *         fiatCurrency:
- *           type: string
- *         pricePerCoin:
- *           type: string
- *         totalAmountOfCrypto:
- *           type: string
- *         rangeMin:
- *           type: string
- *         rangeMax:
- *           type: string
- *         paymentTimeLimit:
- *           type: string
- *         fee:
- *           type: string
- *         details:
- *           type: string
+ * components:      
+ *    securitySchemes:
+ *      bearerAuth:
+ *          type: http
+ *          scheme: bearer
+ *          bearerFormat: JWT
+ *    schemas:
+ *      BuyList:
+ *          type: object
+ *          properties:
+ *              cryptoCurrencyName:
+ *                  type: string
+ *              fiatCurrency:
+ *                  type: string
+ *              pricePerCoin:
+ *                  type: string
+ *              totalAmountOfCrypto:
+ *                  type: string
+ *              rangeMin:
+ *                  type: string
+ *              rangeMax:
+ *                  type: string
+ *              paymentTimeLimit:
+ *                  type: string
+ *              fee:
+ *                  type: string
+ *              details:
+ *                  type: string
  * 
  * /api/v1/buyList/:
  *   post:
