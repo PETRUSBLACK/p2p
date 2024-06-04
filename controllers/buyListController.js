@@ -50,6 +50,8 @@ export const createBuyList = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: `Cryptocurrency ${cryptoCurrencyName} does not exist` });
         }
 
+        console.log(req.userAuth)
+
         const buyList = await BuyList.create({
             user: req.userAuth,
             cryptoCurrency: coin._id,
@@ -71,7 +73,7 @@ export const createBuyList = asyncHandler(async (req, res) => {
             data: buyList
         });
     } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: error });
     }
 })
 

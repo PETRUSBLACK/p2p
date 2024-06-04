@@ -43,11 +43,15 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   const generatedOTP = await OTP.create({ user, otp });
 
+  console.log(otp)
+
   res.status(201).json({
     status: "success",
     message: `Please check your email or sms ${user.fullname} for your otp`,
     otpIdForResendingOtp: generatedOTP._id
   });
+  console.log(user)
+  console.log(email)
 });
 
 export const otpVerification = asyncHandler(async (req, res) => {

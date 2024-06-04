@@ -334,6 +334,32 @@ userRoutes.post("/forget-password", forgetPasswordCtr)
  *     responses:
  *       '200':
  *         description: password updated successfully
+ *     summary: Resend OTP
+ *     description: Resend OTP for user registration process.
+ *     tags:
+ *       - users
+ *     parameters:
+ *       - name: oldOtp
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 6082347c71d89200154eaad4
+ *       - name: resendEmailOTP
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: true
+ *       - name: resendSmsOTP
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *     responses:
+ *       '200':
+ *         description: OTP resent successfully
  *         content:
  *           application/json:
  *             schema:
@@ -354,6 +380,7 @@ userRoutes.post("/forget-password", forgetPasswordCtr)
  */
 
 //reset password
+ 
 userRoutes.post("/reset-password", resetPasswordCtr)
 
 

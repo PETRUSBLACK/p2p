@@ -80,11 +80,11 @@ export const createSellList = asyncHandler(async (req, res) => {
 
         res.status(201).json({
             status: "success",
-            message: " List Created Successfully",
+            message: " List Created Successfully", 
             data: sellList
         });
     } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: error });
     }
 })
 
@@ -99,7 +99,7 @@ export const updateSellList = asyncHandler(async (req, res) => {
 
     const { cryptoCurrencyName, fiatCurrency, pricePerCoin, totalAmountOfCrypto, rangeMin, rangeMax, paymentTimeLimit, fee, details, accountNumber } = req.body;
     const sellListId = req.params.id;
-    
+
     try {
         const coin = await Coin.findOne({ name: cryptoCurrencyName });
 
@@ -156,7 +156,7 @@ export const updateSellList = asyncHandler(async (req, res) => {
 
 export const deleteSellList = asyncHandler(async (req, res) => {
     const sellListId = req.params.id;
-    
+
     try {
         const sellList = await SellList.findById(sellListId);
 
@@ -175,19 +175,19 @@ export const deleteSellList = asyncHandler(async (req, res) => {
             message: "Sell Listing deleted successfully"
         });
     } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: error });
     }
 })
 
 export const getAllSellListing = asyncHandler(async (req, res) => {
     try {
         const sellLists = await SellList.find().populate('user cryptoCurrency');
-
+        
         res.status(200).json({
             status: "success",
             message: "Sell Listing retrieved successfully",
             data: sellLists
-        }); 
+        });
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
@@ -196,7 +196,7 @@ export const getAllSellListing = asyncHandler(async (req, res) => {
 export const getUserSellListing = asyncHandler(async (req, res) => {
     try {
         const sellList = await SellList.find({ user: req.userAuth });
-    
+
         res.status(200).json({
             status: "success",
             message: "Sell Listing retrieved successfully",
