@@ -44,6 +44,37 @@ const buyListRoutes = express.Router();
  */
 
 buyListRoutes.post("/", isLoggedIn, createBuyListValidationRules(), createBuyList);
+/**
+ * @swagger
+ * /api/v1/buyList/buylist/{id}:
+ *   put:
+ *     summary: Update a buy list by ID
+ *     tags: [buyList]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The buy list ID
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/BuyList'
+ *     responses:
+ *       '200':
+ *         description: Successful
+ *       '400':
+ *         description: Bad request
+ *       '404':
+ *         description: Not found
+ *       '500':
+ *         description: Internal server error
+ */
 
 buyListRoutes.put("/buylist/:id", isLoggedIn, updateBuyListValidationRules(), updateBuyList);
 buyListRoutes.delete("/buylist/:id", isLoggedIn, deleteBuyList);
