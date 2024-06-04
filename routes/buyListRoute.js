@@ -6,28 +6,12 @@ const buyListRoutes = express.Router();
 
 /**
  * @swagger
- * /api/v1/buyList/:
- *   post:
- *     summary: The permits users to log in
- *     description: This is the endpoint to log in
- *     tags:
- *       - buycoin
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Buy'
- *      responses:
- *        '201':
- *          description: Successful
- *        '400':
- *          description: Bad request. 
- *        '409':
- *          description: Conflict. 
- *        '500':
- *          description: Internal server error
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     BuyList:
  *       type: object
@@ -50,6 +34,30 @@ const buyListRoutes = express.Router();
  *           type: string
  *         details:
  *           type: string
+ * 
+ * /api/v1/buyList/:
+ *   post:
+ *     summary: Permits users to create a buy list
+ *     description: This is the endpoint to create a buy list
+ *     tags:
+ *       - buyList
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/BuyList'
+ *     responses:
+ *       '201':
+ *         description: Successful
+ *       '400':
+ *         description: Bad request
+ *       '409':
+ *         description: Conflict
+ *       '500':
+ *         description: Internal server error
  */
 
 buyListRoutes.post("/", isLoggedIn, createBuyListValidationRules(), createBuyList);
