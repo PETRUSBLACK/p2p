@@ -56,6 +56,8 @@ const /* `swaggerOptions` is an object that defines the configuration options fo
   the API routes that should be included in the Swagger documentation. This object is then used
   to generate the Swagger documentation using `swaggerJsdoc` and is served using `swaggerUi`
   middleware on the "/api-docs" endpoint in the Express application. */
+
+
   swaggerOptions = {
     swaggerDefinition: {
       openapi: "3.0.0",
@@ -69,11 +71,39 @@ const /* `swaggerOptions` is an object that defines the configuration options fo
         },
         server: ["http://localhost:3000"],
       },
+      components: {
+        securitySchemes: {
+          ApiKeyAuth: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'X-API-KEY',
+          },
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+          customHeaderAuth: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'X-CUSTOM-HEADER',
+          },
+        },
+      },
+      security: [
+        {
+          ApiKeyAuth: [],
+          bearerAuth: [],
+          customHeaderAuth: [],
+        },
+      ],
+      
       schemes: ["http", "https"],
 
     },
     apis: ["./routes/*.js"],
   };
+  
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

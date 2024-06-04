@@ -172,11 +172,19 @@ export const loginUserContrl = asyncHandler(async (req, res) => {
 
 export const userProfile = asyncHandler(async (req, res) => {
   const userFound = await User.findById(req.userAuth);
-
   res.json({
     status: "success",
     message: "User profile fetched successfully",
-    userFound
+    userFound:{
+    profile_img: userFound.profile_img,
+    fullname: userFound.fullname,
+    username: userFound.username,
+    email: userFound.email,
+    phone: userFound.phone,
+    location: userFound.location,
+    bio: userFound.bio
+  }
+
   });
 });
 
@@ -241,7 +249,7 @@ export const forgetPasswordCtr = asyncHandler(async(req, res) => {
       });
 
   })
-
+ 
 
 
   //RESET PASSWORD
@@ -279,3 +287,78 @@ export const forgetPasswordCtr = asyncHandler(async(req, res) => {
 
   })
 
+
+
+
+
+  //upload profile photo
+export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
+  
+      //find the user whose is uploading profile
+      const userProfileToBeUpdated = await User.findById(req.userAuth);
+      if(!userProfileToBeUpdated){
+          res.json({
+              status:"error",
+              message:"User not found"
+          })
+      }
+
+      //check if user is blocked
+      if(userProfileToBeUpdated.isBlocked){
+          return res.json({
+              status:"error",
+              message:"Access denied because your account is presently blocked"
+          })
+      }
+
+      //console.log(req.file);
+      if(req.file){
+          await User.findByIdAndUpdate(req.userAuth,{
+              $set:{
+                profile_img:req.file.path
+              },
+          },{
+              new:true
+          }
+              );
+              res.json({
+                  status:"success",
+                  data:"profile image uploaded successfully"
+              })
+      }
+
+
+   
+}
+)
+
+
+  //update user profile
+  export const updateUserProfile = asyncHandler(async(req, res) => {
+    const{bio, location} = req.body;
+
+    const profileId = req.params.id
+
+    const userProfile = await User.findById(profileId)
+
+    if(!userProfile){
+      throw new Error('user dose not exist')
+    }
+
+    const updatedUserProfile = await User.findByIdAndUpdate(
+      profileId,
+      {
+      bio,
+      location
+    },
+    {
+      new: true
+    }
+  )
+
+  res.status(200).json({
+    status:"success",
+    message: "Profile Updated Successfully"
+  })
+
+  })

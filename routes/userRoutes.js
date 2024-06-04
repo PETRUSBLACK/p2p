@@ -1,7 +1,22 @@
 import express from "express";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import isAdmin from "../middleware/isAdmin.js";
-import { otpVerification, loginUserContrl, userProfile, registerUser, updatePassword, resendOTP, forgetPasswordCtr, resetPasswordCtr } from "../controllers/userController.js"
+import { otpVerification, 
+    loginUserContrl, 
+    userProfile, 
+    registerUser, 
+    updatePassword, 
+    resendOTP, 
+    forgetPasswordCtr, 
+    resetPasswordCtr, 
+    updateUserProfile, 
+    profilePhotoUploadCtrl 
+    } from "../controllers/userController.js"
+import multer from "multer";
+import storage from "../config/profilePhotoUpload.js";
+
+
+const upload = multer({storage})
 
 
 const userRoutes = express.Router();
@@ -154,6 +169,8 @@ userRoutes.post("/verifyotp", otpVerification);
  */
 
 userRoutes.put('/resendOtp', resendOTP)
+
+
 userRoutes.put("/update-password", isLoggedIn, updatePassword);
 
 /**
@@ -198,13 +215,13 @@ userRoutes.put("/update-password", isLoggedIn, updatePassword);
  *         email:
  *           type: string
  *           format: email
- *         password:
- *           type: string
- *           format: password
  *         username:
  *           type: string
- *           format: email
+ *           format: username
  *         phone:
+ *           type: string
+ *           format: number
+ *         password:
  *           type: string
  *           format: password
  *       required:
@@ -213,14 +230,110 @@ userRoutes.put("/update-password", isLoggedIn, updatePassword);
  */
 
 userRoutes.post("/login", loginUserContrl);
+
+
+/**
+ * @swagger
+ * /api/v1/users/profile:
+ *   get:
+ *     summary: Retrieve user profile
+ *     tags:
+ *       - users
+ *     security:
+ *       - ApiKeyAuth: []
+ *       - bearerAuth: []
+ *       - customHeaderAuth: []
+ *     responses:
+ *       200:
+ *         description: A user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: The user ID
+ *                 name:
+ *                   type: string
+ *                   description: The user's name
+ *                 email:
+ *                   type: string
+ *                   description: The user's email
+ *       401:
+ *         description: Unauthorized
+ */
+
 userRoutes.get("/profile", isLoggedIn, userProfile);
+
+
+
+/**
+ * @swagger
+ * /api/v1/users/forget-password:
+ *   post:
+ *     summary: Create new password if user forget their password
+ *     description: This endpoint enable user create new password which an email will be send to the user to click an reset password.
+ *     tags:
+ *       - users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Password reset sent successfully to your email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Password reset sent successfully to your email
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: Invalid or the link expired
+ *       '500':
+ *         description: Internal server error
+ */
 
 //forget password
 userRoutes.post("/forget-password", forgetPasswordCtr)
+
+
+
 /**
  * @swagger
  * /api/v1/users/reset-password:
  *   post:
+ *     summary: Confirm the link send to your email
+ *     description: Click the link send to your email to complete password reset process.
+ *     tags:
+ *       - users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               resetToken:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: password updated successfully
  *     summary: Resend OTP
  *     description: Resend OTP for user registration process.
  *     tags:
@@ -253,32 +366,91 @@ userRoutes.post("/forget-password", forgetPasswordCtr)
  *               type: object
  *               properties:
  *                 status:
- *                   type: boolean
- *                   example: true
+ *                   type: string
+ *                   example: success
  *                 message:
  *                   type: string
- *                   example: John Doe please check your email for your new otp
- *       '404':
- *         description: Otp not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Otp not found
+ *                   example: password updated successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: Invalid or the link expired
  *       '500':
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Internal server error
  */
+
+//reset password
+ 
 userRoutes.post("/reset-password", resetPasswordCtr)
+
+
+// Upload profile photo endpoint
+
+/**
+ * @swagger
+ * /api/v1/users/profile-image:
+ *   post:
+ *     summary: Upload user profile photo
+ *     description: Upload a profile photo for a user.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profile:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Profile photo uploaded successfully
+ *       400:
+ *         description: Invalid input
+ */
+
+//upload profile photo
+userRoutes.post("/profile-image", isLoggedIn, upload.single("profile"), profilePhotoUploadCtrl)
+
+
+
+/**
+ * @swagger
+ * /api/v1/users/update-profile/{id}:
+ *   put:
+ *     summary: Update user profile
+ *     description: Update the profile information of a user by their ID.
+ *     tags:
+ *       - users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               bio:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: User not found
+ */
+
+//update userProfile
+userRoutes.put("/update-profile/:id", isLoggedIn, updateUserProfile)
+
 
 export default userRoutes;

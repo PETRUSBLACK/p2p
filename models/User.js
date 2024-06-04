@@ -36,9 +36,11 @@ const UserSchema = new schema({
     },
     bio: {
         type: String,
+        //default: "Thanks"
     },
     location: {
         type: String,
+        //default: "Nigerian"
     },
     seller_info: {
         no_of_trades: {
@@ -67,6 +69,10 @@ const UserSchema = new schema({
     isAdmin: {
         type: Boolean,
         default: false,
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false
     },
     googleId: {
         type: String
