@@ -10,10 +10,8 @@ import { otpVerification,
     forgetPasswordCtr, 
     resetPasswordCtr, 
     updateUserProfile, 
-    profilePhotoUploadCtrl, 
-    adminUpdateUserProfile,
-    adminBlockUserCtrl,
-    adminUnBlockUserCtrl} from "../controllers/userController.js"
+    profilePhotoUploadCtrl 
+    } from "../controllers/userController.js"
 import multer from "multer";
 import storage from "../config/profilePhotoUpload.js";
 
@@ -171,6 +169,8 @@ userRoutes.post("/verifyotp", otpVerification);
  */
 
 userRoutes.put('/resendOtp', resendOTP)
+
+
 userRoutes.put("/update-password", isLoggedIn, updatePassword);
 
 /**
@@ -215,13 +215,13 @@ userRoutes.put("/update-password", isLoggedIn, updatePassword);
  *         email:
  *           type: string
  *           format: email
- *         password:
- *           type: string
- *           format: password
  *         username:
  *           type: string
  *           format: username
  *         phone:
+ *           type: string
+ *           format: number
+ *         password:
  *           type: string
  *           format: password
  *       required:
@@ -359,7 +359,6 @@ userRoutes.post("/reset-password", resetPasswordCtr)
 
 // Upload profile photo endpoint
 
-
 /**
  * @swagger
  * /api/v1/users/profile-image:
@@ -426,15 +425,5 @@ userRoutes.post("/profile-image", isLoggedIn, upload.single("profile"), profileP
 //update userProfile
 userRoutes.put("/update-profile/:id", isLoggedIn, updateUserProfile)
 
-
-//FOR ADMIN
-//admin update user
-userRoutes.put("/admin-update-user/:id", isLoggedIn, isAdmin, adminUpdateUserProfile)
-
-//admin block user
-userRoutes.put("/admin-block-user/:id", isLoggedIn, isAdmin, adminBlockUserCtrl)
-
-//admin unblock user
-userRoutes.put("/admin-unblock-user/:id", isLoggedIn, isAdmin, adminUnBlockUserCtrl)
 
 export default userRoutes;

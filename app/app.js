@@ -55,28 +55,7 @@ const /* `swaggerOptions` is an object that defines the configuration options fo
   to generate the Swagger documentation using `swaggerJsdoc` and is served using `swaggerUi`
   middleware on the "/api-docs" endpoint in the Express application. */
 
-  // swaggerOptions = {
-  //   swaggerDefinition: {
-  //     openapi: "3.0.0",
-  //     info: {
-  //       title: "P2P Cryptocurrency Exchange",
-  //       version: "1.0.0",
-  //       description:
-  //         "This is a backend api documentation for P2P Cryptocurrency application",
-  //       contact: {
-  //         name: "Stringcode Limited",
-  //       },
-  //       server: ["http://localhost:3000"],
-  //     },
-      
-  //     schemes: ["http", "https"],
 
-  //   },
-  //   apis: ["./routes/*.js"],
-  // };
-
-
-  // this enable us to add jwb token bearer
   swaggerOptions = {
     swaggerDefinition: {
       openapi: "3.0.0",
