@@ -249,7 +249,7 @@ export const forgetPasswordCtr = asyncHandler(async(req, res) => {
       });
 
   })
-
+ 
 
 
   //RESET PASSWORD
