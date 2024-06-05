@@ -1,49 +1,77 @@
 import express from "express";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
-import { createBuyList, createBuyListValidationRules, deleteBuyList, getAllBuyListing, getUserBuyListing, updateBuyList, updateBuyListValidationRules } from "../controllers/buyListController.js";
+import {
+  createBuyList,
+  createBuyListValidationRules,
+  deleteBuyList,
+  getAllBuyListing,
+  getUserBuyListing,
+  updateBuyList,
+  updateBuyListValidationRules
+} from "../controllers/buyListController.js";
 
 const buyListRoutes = express.Router();
 
 /**
  * @swagger
- * /api/v1/users/register:
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     BuyList:
+ *       type: object
+ *       properties:
+ *         cryptoCurrencyName:
+ *           type: string
+ *         fiatCurrency:
+ *           type: string
+ *         pricePerCoin:
+ *           type: string
+ *         totalAmountOfCrypto:
+ *           type: string
+ *         rangeMin:
+ *           type: string
+ *         rangeMax:
+ *           type: string
+ *         paymentTimeLimit:
+ *           type: string
+ *         fee:
+ *           type: string
+ *         details:
+ *           type: string
+ */
+
+/**
+ * @swagger
+ * /api/v1/buyList/:
  *   post:
- *     summary: Create otp for user registration
- *     description: This is the endpoint to create an otp for a user which the user will verify and be registered succesfully
+ *     summary: Permits users to create a buy list
+ *     description: This is the endpoint to create a buy list
  *     tags:
- *       - users
+ *       - buyList
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             $ref: '#/components/schemas/BuyList'
  *     responses:
  *       '201':
- *         description: Please check your email and sms for your otp's
+ *         description: Successful
  *       '400':
- *         description: Bad request. Invalid email format.
+ *         description: Bad request
  *       '409':
- *         description: Conflict. User with provided email already exists.
+ *         description: Conflict
  *       '500':
  *         description: Internal server error
- *
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         fullname:
- *           type: string
- *         password:
- *           type: string
- *         email:
- *           type: string
- *         phone:
- *           type: string
  */
-
 buyListRoutes.post("/", isLoggedIn, createBuyListValidationRules(), createBuyList);
+
 /**
  * @swagger
  * /api/v1/buyList/buylist/{id}:
@@ -75,10 +103,65 @@ buyListRoutes.post("/", isLoggedIn, createBuyListValidationRules(), createBuyLis
  *       '500':
  *         description: Internal server error
  */
-
 buyListRoutes.put("/buylist/:id", isLoggedIn, updateBuyListValidationRules(), updateBuyList);
+
+/**
+ * @swagger
+ * /api/v1/buyList/buylist/{id}:
+ *   delete:
+ *     summary: Delete a buy list by ID
+ *     tags: [buyList]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The buy list ID
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '204':
+ *         description: No content
+ *       '400':
+ *         description: Bad request
+ *       '404':
+ *         description: Not found
+ *       '500':
+ *         description: Internal server error
+ */
 buyListRoutes.delete("/buylist/:id", isLoggedIn, deleteBuyList);
+
+/**
+ * @swagger
+ * /api/v1/buyList/buylist/list:
+ *   get:
+ *     summary: Get all buy lists
+ *     tags: [buyList]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successful
+ *       '500':
+ *         description: Internal server error
+ */
 buyListRoutes.get("/buylist/list", isLoggedIn, getAllBuyListing);
+
+/**
+ * @swagger
+ * /api/v1/buyList/buylist/get:
+ *   get:
+ *     summary: Get user's buy lists
+ *     tags: [buyList]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successful
+ *       '500':
+ *         description: Internal server error
+ */
 buyListRoutes.get("/buylist/get", isLoggedIn, getUserBuyListing);
 
 export default buyListRoutes;
