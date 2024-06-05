@@ -316,24 +316,6 @@ userRoutes.post("/forget-password", forgetPasswordCtr)
  * @swagger
  * /api/v1/users/reset-password:
  *   post:
- *     summary: Confirm the link send to your email
- *     description: Click the link send to your email to complete password reset process.
- *     tags:
- *       - users
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               resetToken:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       '200':
- *         description: password updated successfully
  *     summary: Resend OTP
  *     description: Resend OTP for user registration process.
  *     tags:
