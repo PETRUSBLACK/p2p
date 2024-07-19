@@ -33,6 +33,19 @@ export const updateBuyListValidationRules = () => {
     ];
 };
 
+// {
+//     "cryptoCurrencyName": "btc",
+//     "fiatCurrency": "10000",
+//     "pricePerCoin": "1200",
+//     "totalAmountOfCrypto": "12000",
+//     "rangeMin": "100",
+//     "rangeMax": "10000",
+//     "paymentTimeLimit" :"2",
+//     "fee": "120",
+//     "details" : "This is details"
+
+// }
+
 export const createBuyList = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -41,16 +54,24 @@ export const createBuyList = asyncHandler(async (req, res) => {
         });
     }
 
-    const { cryptoCurrencyName, fiatCurrency, pricePerCoin, totalAmountOfCrypto, rangeMin, rangeMax, paymentTimeLimit, fee, details } = req.body;
+    const { cryptoCurrencyName, 
+            fiatCurrency, 
+            pricePerCoin, 
+            totalAmountOfCrypto, 
+            rangeMin, 
+            rangeMax, 
+            paymentTimeLimit, 
+            fee, 
+            details } = req.body;
 
     try {
         const coin = await Coin.findOne({ name: cryptoCurrencyName });
 
         if (!coin) {
             return res.status(400).json({ message: `Cryptocurrency ${cryptoCurrencyName} does not exist` });
-        }
+        };
 
-        console.log(req.userAuth)
+        // console.log(req.userAuth)
 
         const buyList = await BuyList.create({
             user: req.userAuth,
@@ -72,7 +93,7 @@ export const createBuyList = asyncHandler(async (req, res) => {
             message: "Buy List Created Successfully",
             data: buyList
         });
-    } catch (error) {
+    }catch (error) {
         res.status(500).json({ message: error });
     }
 })
@@ -145,7 +166,7 @@ export const deleteBuyList = asyncHandler(async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
-        const buyListDeleted = await BuyList.findByIdAndDelete(buyListId);
+        // const buyListDeleted = await BuyList.findByIdAndDelete(buyListId);
 
         res.status(200).json({
             status: "success",
