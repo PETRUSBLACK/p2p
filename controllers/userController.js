@@ -141,13 +141,13 @@ export const updatePassword = asyncHandler(async (req, res) => {
 })
 
 export const loginUserContrl = asyncHandler(async (req, res) => {
-  const { email, username, phone, password } = req.body;
+  const { email, password } = req.body;
 
   if (!password) {
     return res.status(400).json({ message: "Password field should not be empty" });
   }
 
-  const userFound = await User.findOne({ $or: [{ email }, { username }, { phone }] });
+  const userFound = await User.findOne({ email });
 
   if (!userFound) {
     return res.status(404).json({ message: "Invalid email, username or phonenumber" });
