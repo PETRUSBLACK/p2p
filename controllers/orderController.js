@@ -10,13 +10,27 @@ import Wallet from "../models/Wallet.js";
 export const createOrder = asyncHandler(async (req, res) => {
     const { totalFiatAmountToPay, totalQuantityOfCryptoBought } = req.body;
     const sellListId = req.params.id;
+    const reserved_coin = 0;
 
     try {
         const sellList = await SellList.findById(sellListId);
 
+        // checking if the seller exit
         if (!sellList) {
             return res.status(404).json({ message: "Sell Listing Could not be found" });
         }
+
+        //checking the quantity of coin to be sold
+        // if(sellList.totalAmountOfCrypto < totalQuantityOfCryptoBought){
+        //     return res.status(404).json({ message: "Total amount of coin is not available"})
+        // }
+
+        if(totalQuantityOfCryptoBought < sellList.range.min || totalQuantityOfCryptoBought > sellList.range.max) {
+            return res.status(404).json({ message: "You are out of range "})
+        }
+ 
+        // transferring the coin from the seller account to the reserve in the order model
+        // reserved_coin = totalQuantityOfCryptoBought;            
 
         const coin = await Coin.findById(sellList.cryptoCurrency);
 
@@ -32,6 +46,11 @@ export const createOrder = asyncHandler(async (req, res) => {
         if (!coinInWallet || coinInWallet.quantity < totalQuantityOfCryptoBought) {
             return res.status(404).json({ message: "Seller does not have enough coins for the order" });
         }
+
+        // deducting the coin from the seller's account
+        coinInWallet.quantity -= totalQuantityOfCryptoBought
+
+        await coinInWallet.save()
 
         const order = await Order.create({
             seller: sellList.user,

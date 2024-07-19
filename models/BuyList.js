@@ -38,6 +38,11 @@ const BuySchema = new schema({
         type: Number,
         required: true
     },
+    accountInfoForTransaction:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PaymentAccount",
+        required: true
+    },
     details: {
         type: String,
         required: true
