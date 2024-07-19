@@ -175,15 +175,15 @@ export const userProfile = asyncHandler(async (req, res) => {
   res.json({
     status: "success",
     message: "User profile fetched successfully",
-    userFound:{
-    profile_img: userFound.profile_img,
-    fullname: userFound.fullname,
-    username: userFound.username,
-    email: userFound.email,
-    phone: userFound.phone,
-    location: userFound.location,
-    bio: userFound.bio
-  }
+    userFound: {
+      profile_img: userFound.profile_img,
+      fullname: userFound.fullname,
+      username: userFound.username,
+      email: userFound.email,
+      phone: userFound.phone,
+      location: userFound.location,
+      bio: userFound.bio
+    }
 
   });
 });
@@ -216,138 +216,138 @@ async function initializeUserWallet(userId) {
 
 
 //FORGET PASSWORD
-export const forgetPasswordCtr = asyncHandler(async(req, res) => {
-    
-      const {email} = req.body;
-      //check if email is valid
-      const user = await User.findOne({email});
-      if(!user){
-        throw new Error(`user with ${email} does not exist`)
-      }
+export const forgetPasswordCtr = asyncHandler(async (req, res) => {
 
-      //generate a reset token
-      const resetToken = jwt.sign({userId: user._id}, process.env.JWT_KEY,{
-        expiresIn:'1h'
-      })
+  const { email } = req.body;
+  //check if email is valid
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error(`user with ${email} does not exist`)
+  }
 
-      //set the  reset token and its expiration on the user obj
-
-      user.resetToken = resetToken;
-      user.reseTokenExpiration = Date.now() + 3600000;
-      
-      user.save()
-      //send password reset email
-      const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
-      const html = `<h3>RESET PASSWORD</h3><br/> Below is the link to reset your password<br>This link only valid for 1 hour, please do not share with anyone<hr/><br/>click <strong><a href='${resetUrl}'>here</a></strong> to reset your password</p><p>Having any issue? kindly contact our support team</p>`
-      await sendEmail(user.email,'Reset Your Password', html);
-
-      //console.log(resetUrl);
-
-      res.status(200).json({
-        status:"success",
-        message:`Password reset sent successfully to your email ${user.email}` 
-      });
-
-  })
- 
-
-
-  //RESET PASSWORD
-  export const resetPasswordCtr = asyncHandler(async(req, res) => {
-    
-      const {resetToken,password} =req.body;
-      //find the user with token
-      const user = await User.findOne({
-        resetToken,
-        reseTokenExpiration: {$gt: Date.now()},
-      })
-
-      if(!user){
-        throw new Error('Invalid or the link expired')
-      }
-
-      //hash
-      const salt = await bcrypt.genSalt(10);
-      const hashPassword = await bcrypt.hash(password,salt);
-
-      //Update user obj
-      user.password = hashPassword;
-      user.resetToken = undefined;
-      user.reseTokenExpiration = undefined
-
-      await user.save();
-
-      res.status(200).json({
-        status:"success",
-        message:"Your password reset successfully"
-      });
-
-      const html = `<h3>success</h3><br/> <p>Your password changed successfully</p>`
-      await sendEmail(user.email,'Password Message', html);
-
+  //generate a reset token
+  const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_KEY, {
+    expiresIn: '1h'
   })
 
+  //set the  reset token and its expiration on the user obj
+
+  user.resetToken = resetToken;
+  user.reseTokenExpiration = Date.now() + 3600000;
+
+  user.save()
+  //send password reset email
+  const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+  const html = `<h3>RESET PASSWORD</h3><br/> Below is the link to reset your password<br>This link only valid for 1 hour, please do not share with anyone<hr/><br/>click <strong><a href='${resetUrl}'>here</a></strong> to reset your password</p><p>Having any issue? kindly contact our support team</p>`
+  await sendEmail(user.email, 'Reset Your Password', html);
+
+  //console.log(resetUrl);
+
+  res.status(200).json({
+    status: "success",
+    message: `Password reset sent successfully to your email ${user.email}`
+  });
+
+})
+
+
+
+//RESET PASSWORD
+export const resetPasswordCtr = asyncHandler(async (req, res) => {
+
+  const { resetToken, password } = req.body;
+  //find the user with token
+  const user = await User.findOne({
+    resetToken,
+    reseTokenExpiration: { $gt: Date.now() },
+  })
+
+  if (!user) {
+    throw new Error('Invalid or the link expired')
+  }
+
+  //hash
+  const salt = await bcrypt.genSalt(10);
+  const hashPassword = await bcrypt.hash(password, salt);
+
+  //Update user obj
+  user.password = hashPassword;
+  user.resetToken = undefined;
+  user.reseTokenExpiration = undefined
+
+  await user.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Your password reset successfully"
+  });
+
+  const html = `<h3>success</h3><br/> <p>Your password changed successfully</p>`
+  await sendEmail(user.email, 'Password Message', html);
+
+})
 
 
 
 
-  //upload profile photo
-export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
-  
-      //find the user whose is uploading profile
-      const userProfileToBeUpdated = await User.findById(req.userAuth);
-      if(!userProfileToBeUpdated){
-          res.json({
-              status:"error",
-              message:"User not found"
-          })
-      }
 
-      //check if user is blocked
-      if(userProfileToBeUpdated.isBlocked){
-          return res.json({
-              status:"error",
-              message:"Access denied because your account is presently blocked"
-          })
-      }
+//upload profile photo
+export const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
 
-      //console.log(req.file);
-      if(req.file){
-          await User.findByIdAndUpdate(req.userAuth,{
-              $set:{
-                profile_img:req.file.path
-              },
-          },{
-              new:true
-          }
-              );
-              res.json({
-                  status:"success",
-                  data:"profile image uploaded successfully"
-              })
-      }
+  //find the user whose is uploading profile
+  const userProfileToBeUpdated = await User.findById(req.userAuth);
+  if (!userProfileToBeUpdated) {
+    res.json({
+      status: "error",
+      message: "User not found"
+    })
+  }
+
+  //check if user is blocked
+  if (userProfileToBeUpdated.isBlocked) {
+    return res.json({
+      status: "error",
+      message: "Access denied because your account is presently blocked"
+    })
+  }
+
+  //console.log(req.file);
+  if (req.file) {
+    await User.findByIdAndUpdate(req.userAuth, {
+      $set: {
+        profile_img: req.file.path
+      },
+    }, {
+      new: true
+    }
+    );
+    res.json({
+      status: "success",
+      data: "profile image uploaded successfully"
+    })
+  }
 
 
-   
+
 }
 )
 
 
-  //update user profile
-  export const updateUserProfile = asyncHandler(async(req, res) => {
-    const{bio, location} = req.body;
+//update user profile
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const { bio, location } = req.body;
 
-    const profileId = req.params.id
+  const profileId = req.params.id
 
-    const userProfile = await User.findById(profileId)
+  const userProfile = await User.findById(profileId)
 
-    if(!userProfile){
-      throw new Error('user dose not exist')
-    }
+  if (!userProfile) {
+    throw new Error('user dose not exist')
+  }
 
-    const updatedUserProfile = await User.findByIdAndUpdate(
-      profileId,
-      {
+  const updatedUserProfile = await User.findByIdAndUpdate(
+    profileId,
+    {
       bio,
       location
     },
@@ -357,8 +357,8 @@ export const profilePhotoUploadCtrl = asyncHandler(async(req, res) =>{
   )
 
   res.status(200).json({
-    status:"success",
+    status: "success",
     message: "Profile Updated Successfully"
   })
 
-  })
+})

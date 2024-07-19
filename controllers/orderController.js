@@ -17,7 +17,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
         // checking if the seller exit
         if (!sellList) {
-            return res.status(404).json({ message: "Sell Listing Could not be found" });
+            return res.status(404).json({ message: "Sell Listing could not be found" });
         }
 
         //checking the quantity of coin to be sold
@@ -33,24 +33,37 @@ export const createOrder = asyncHandler(async (req, res) => {
         // reserved_coin = totalQuantityOfCryptoBought;            
 
         const coin = await Coin.findById(sellList.cryptoCurrency);
+        if (!coin) {
+            return res.status(404).json({ message: "Cryptocurrency not found" });
+        }
+
+        if(totalFiatAmountToPay < sellList.range.min || totalFiatAmountToPay > sellList.range.max ){
+            return res.status(404).json({ message: "Fiat amount is more than the range specified." });
+        }
 
         const account = await PaymentAccount.findById(sellList.accountInfoForTransaction);
+        if (!account) {
+            return res.status(404).json({ message: "Payment account not found" });
+        }
 
         const wallet = await Wallet.findOne({ userId: sellList.user });
-
         if (!wallet) {
             return res.status(404).json({ message: "Seller's wallet not found" });
         }
 
         const coinInWallet = wallet.coins.find(coinItem => coinItem.coin.toString() === coin._id.toString());
         if (!coinInWallet || coinInWallet.quantity < totalQuantityOfCryptoBought) {
-            return res.status(404).json({ message: "Seller does not have enough coins for the order" });
+            return res.status(400).json({ message: "Seller does not have enough coins for the order" });
         }
 
         // deducting the coin from the seller's account
         coinInWallet.quantity -= totalQuantityOfCryptoBought
 
         await coinInWallet.save()
+        const reserve = coinInWallet.quantity - totalQuantityOfCryptoBought;
+
+        coinInWallet.quantity -= totalQuantityOfCryptoBought;
+        await wallet.save();
 
         const order = await Order.create({
             seller: sellList.user,
@@ -63,7 +76,8 @@ export const createOrder = asyncHandler(async (req, res) => {
             accountInfoForTransaction: account,
             tradeType: `Buy ${coin.name}`,
             paymentTimeLimit: sellList.paymentTimeLimit,
-            details: sellList.details
+            details: sellList.details,
+            reserve: reserve
         });
 
         res.status(201).json({
