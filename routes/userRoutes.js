@@ -14,7 +14,7 @@ import { otpVerification,
     } from "../controllers/userController.js"
 import multer from "multer";
 import storage from "../config/profilePhotoUpload.js";
-
+import User from "../models/User.js";
 
 const upload = multer({storage})
 
@@ -433,6 +433,20 @@ userRoutes.post("/profile-image", isLoggedIn, upload.single("profile"), profileP
 
 //update userProfile
 userRoutes.put("/update-profile/:id", isLoggedIn, updateUserProfile)
+
+userRoutes.get("/all", isLoggedIn, async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json({
+            status: "success",
+            message: "Users fetched successfully",
+            data: users,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 
 export default userRoutes;
